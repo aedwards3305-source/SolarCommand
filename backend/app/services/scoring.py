@@ -165,13 +165,19 @@ async def score_lead(db: AsyncSession, lead_id: int) -> LeadScore:
     )
     db.add(score_record)
 
-    # Update lead status based on score
-    if result.total >= 75:
-        lead.status = LeadStatus.hot
-    elif result.total >= 50:
-        lead.status = LeadStatus.warm
-    else:
-        lead.status = LeadStatus.cool
+    # Update lead status based on score — but never downgrade from protected statuses
+    protected_statuses = {
+        LeadStatus.appointment_set,
+        LeadStatus.qualified,
+        LeadStatus.closed_won,
+    }
+    if lead.status not in protected_statuses:
+        if result.total >= 75:
+            lead.status = LeadStatus.hot
+        elif result.total >= 50:
+            lead.status = LeadStatus.warm
+        else:
+            lead.status = LeadStatus.cool
 
     await db.flush()
     return score_record

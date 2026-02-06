@@ -6,6 +6,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.core.security import get_current_user
 from app.models.schema import (
     Appointment,
     AppointmentStatus,
@@ -15,7 +16,7 @@ from app.models.schema import (
     OutreachAttempt,
 )
 
-router = APIRouter(prefix="/dashboard", tags=["dashboard"])
+router = APIRouter(prefix="/dashboard", tags=["dashboard"], dependencies=[Depends(get_current_user)])
 
 
 class KPIResponse(BaseModel):
@@ -43,9 +44,7 @@ async def get_kpis(db: AsyncSession = Depends(get_db)):
     )
     status_breakdown = {row[0].value: row[1] for row in status_result.all()}
 
-    hot_leads = sum(
-        v for k, v in status_breakdown.items() if k in ("hot", "appointment_set", "qualified")
-    )
+    hot_leads = status_breakdown.get("hot", 0)
     warm_leads = status_breakdown.get("warm", 0)
     cool_leads = status_breakdown.get("cool", 0)
 

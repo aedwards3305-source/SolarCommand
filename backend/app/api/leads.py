@@ -10,6 +10,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.core.security import get_current_user
 from app.models.schema import (
     AuditLog,
     ConsentLog,
@@ -27,7 +28,7 @@ from app.models.schema import (
 )
 from app.services.scoring import score_lead
 
-router = APIRouter(prefix="/leads", tags=["leads"])
+router = APIRouter(prefix="/leads", tags=["leads"], dependencies=[Depends(get_current_user)])
 
 
 # ── Request / Response schemas ──────────────────────────────────────────
@@ -760,6 +761,12 @@ async def ingest_csv(file: UploadFile = File(...), db: AsyncSession = Depends(ge
             )
             db.add(lead)
             await db.flush()
+
+            # Auto-score the new lead
+            try:
+                await score_lead(db, lead.id)
+            except Exception:
+                pass  # Scoring failure shouldn't block ingestion
 
             ingested += 1
 

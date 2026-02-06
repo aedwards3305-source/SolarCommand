@@ -9,7 +9,6 @@ from app.services.scoring import ScoringResult, compute_score
 def _make_property(**overrides) -> Property:
     """Create a Property instance with sensible defaults."""
     defaults = {
-        "id": 1,
         "address_line1": "123 Test St",
         "city": "Annapolis",
         "state": "MD",
@@ -27,10 +26,7 @@ def _make_property(**overrides) -> Property:
         "median_household_income": 95000.0,
     }
     defaults.update(overrides)
-    prop = Property.__new__(Property)
-    for k, v in defaults.items():
-        setattr(prop, k, v)
-    return prop
+    return Property(**defaults)
 
 
 class TestScoringResult:

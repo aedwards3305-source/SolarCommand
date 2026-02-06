@@ -10,6 +10,7 @@ from app.core.security import (
     create_access_token,
     get_current_user,
     hash_password,
+    require_role,
     verify_password,
 )
 from app.models.schema import RepUser, UserRole
@@ -90,9 +91,14 @@ async def get_me(current_user: RepUser = Depends(get_current_user)):
     )
 
 
-@router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/register",
+    response_model=UserOut,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_role("admin"))],
+)
 async def register(payload: RegisterRequest, db: AsyncSession = Depends(get_db)):
-    """Register a new user (admin-only in production, open for MVP)."""
+    """Register a new user (admin-only)."""
     existing = await db.execute(select(RepUser).where(RepUser.email == payload.email))
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=409, detail="Email already registered")

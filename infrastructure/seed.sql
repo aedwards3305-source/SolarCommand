@@ -1,13 +1,15 @@
 -- Seed data: run AFTER Alembic migrations create the tables.
 
--- Default admin user
-INSERT INTO rep_user (email, name, role, is_active)
-VALUES ('admin@solarcommand.local', 'System Admin', 'admin', true)
+-- Default admin user (password: SolarAdmin1!)
+INSERT INTO rep_user (email, name, role, is_active, password_hash)
+VALUES ('admin@solarcommand.local', 'System Admin', 'admin', true,
+        '$2b$12$fTlgTexhr.xHRCQCwExck.xv/UxH/y8OBnXcJPexhwTC6opFmKYrG')
 ON CONFLICT (email) DO NOTHING;
 
--- Default rep user
-INSERT INTO rep_user (email, name, role, is_active)
-VALUES ('rep@solarcommand.local', 'Demo Rep', 'rep', true)
+-- Default rep user (password: SolarRep1!)
+INSERT INTO rep_user (email, name, role, is_active, password_hash)
+VALUES ('rep@solarcommand.local', 'Demo Rep', 'rep', true,
+        '$2b$12$odrmiFrazFkcFbSNgGlMmeWARdzMNYSxH7LmGgWgCMTA2p71yloki')
 ON CONFLICT (email) DO NOTHING;
 
 -- Initial voice call script

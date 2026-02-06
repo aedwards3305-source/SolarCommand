@@ -58,14 +58,13 @@ async def get_current_user(
         except JWTError:
             raise HTTPException(status_code=401, detail="Invalid token")
 
-    # Fallback: API key check (dev mode)
-    if not getattr(settings, "api_key", None):
-        # No auth configured — return first admin user for dev
-        result = await db.execute(select(RepUser).limit(1))
-        user = result.scalar_one_or_none()
-        if user:
-            return user
-        raise HTTPException(status_code=401, detail="No users in system")
+    # Fallback: API key check
+    if api_key and getattr(settings, "api_key", None):
+        if api_key == settings.api_key:
+            result = await db.execute(select(RepUser).limit(1))
+            user = result.scalar_one_or_none()
+            if user:
+                return user
 
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

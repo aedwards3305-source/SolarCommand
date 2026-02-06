@@ -9,7 +9,6 @@ from app.services.orchestrator import MAX_CALL_ATTEMPTS, MAX_SMS_ATTEMPTS, selec
 def _make_lead(**overrides) -> Lead:
     """Create a Lead instance for testing."""
     defaults = {
-        "id": 1,
         "property_id": 1,
         "status": LeadStatus.hot,
         "total_call_attempts": 0,
@@ -17,10 +16,7 @@ def _make_lead(**overrides) -> Lead:
         "total_emails_sent": 0,
     }
     defaults.update(overrides)
-    lead = Lead.__new__(Lead)
-    for k, v in defaults.items():
-        setattr(lead, k, v)
-    return lead
+    return Lead(**defaults)
 
 
 class TestSelectChannel:
