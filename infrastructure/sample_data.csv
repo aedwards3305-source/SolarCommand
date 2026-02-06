@@ -1,0 +1,11 @@
+address_line1,city,state,zip_code,county,parcel_id,property_type,year_built,roof_area_sqft,assessed_value,utility_zone,tree_cover_pct,neighborhood_solar_pct,has_existing_solar,owner_first_name,owner_last_name,owner_occupied,owner_phone,owner_email,median_household_income
+456 Maple Ave,Baltimore,MD,21201,Baltimore City,BC-001,SFH,2015,1600,350000,BGE,10,12,false,Sarah,Johnson,true,+14105551001,sarah.j@example.com,85000
+789 Pine St,Bethesda,MD,20814,Montgomery,MO-001,TOWNHOME,2018,1200,520000,PEPCO,20,8,false,Michael,Chen,true,+12405551002,m.chen@example.com,125000
+101 Elm Rd,Columbia,MD,21044,Howard,HO-001,SFH,2005,2200,475000,BGE,5,15,false,Jessica,Williams,true,+14435551003,j.williams@example.com,110000
+222 Cedar Ln,Annapolis,MD,21401,Anne Arundel,AA-001,SFH,2012,1900,400000,BGE,8,10,false,David,Martinez,true,+14105551004,d.martinez@example.com,95000
+333 Birch Dr,Silver Spring,MD,20901,Montgomery,MO-002,CONDO,2020,900,280000,PEPCO,25,5,false,Emily,Brown,true,+13015551005,e.brown@example.com,75000
+444 Walnut Way,Rockville,MD,20850,Montgomery,MO-003,SFH,2008,1800,550000,PEPCO,12,9,false,Robert,Davis,true,+13015551006,r.davis@example.com,130000
+555 Oak Ct,Towson,MD,21204,Baltimore,BA-001,SFH,2011,1700,380000,BGE,15,11,false,Amanda,Wilson,true,+14435551007,a.wilson@example.com,90000
+666 Ash Blvd,Frederick,MD,21701,Frederick,FR-001,SFH,2003,2000,325000,BGE,7,6,false,James,Anderson,true,+13015551008,j.anderson@example.com,80000
+777 Spruce Pl,Bowie,MD,20715,Prince Georges,PG-001,SFH,2016,1500,310000,PEPCO,18,4,false,Jennifer,Taylor,true,+12405551009,j.taylor@example.com,70000
+888 Hickory Rd,Ellicott City,MD,21042,Howard,HO-002,SFH,2014,2100,500000,BGE,6,13,false,Thomas,Moore,true,+14105551010,t.moore@example.com,115000

@@ -28,6 +28,11 @@ class Settings(BaseSettings):
     # OpenAI
     openai_api_key: str = ""
 
+    # JWT Auth
+    jwt_secret: str = "change-me-in-production-use-openssl-rand-hex-32"
+    jwt_algorithm: str = "HS256"
+    jwt_expire_minutes: int = 480  # 8 hours
+
     # Scoring
     score_hot_threshold: int = 75
     score_warm_threshold: int = 50

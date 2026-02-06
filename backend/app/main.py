@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import admin, appointments, leads, outreach
+from app.api import admin, appointments, auth, dashboard, leads, outreach
 from app.core.config import get_settings
 
 
@@ -21,7 +21,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="SolarCommand API",
     description="Solar Lead Automation System — Lead Intelligence + AI Outreach + CRM",
-    version="0.1.0",
+    version="0.2.0",
     lifespan=lifespan,
 )
 
@@ -35,9 +35,11 @@ app.add_middleware(
 )
 
 # Routers
+app.include_router(auth.router)
 app.include_router(leads.router)
 app.include_router(outreach.router)
 app.include_router(appointments.router)
+app.include_router(dashboard.router)
 app.include_router(admin.router)
 
 

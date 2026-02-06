@@ -384,7 +384,8 @@ class RepUser(Base):
     role: Mapped[UserRole] = mapped_column(Enum(UserRole), default=UserRole.rep)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
-    # API key hash for MVP auth
+    # Auth
+    password_hash: Mapped[str | None] = mapped_column(String(255))
     api_key_hash: Mapped[str | None] = mapped_column(String(255))
 
     created_at: Mapped[datetime] = mapped_column(
