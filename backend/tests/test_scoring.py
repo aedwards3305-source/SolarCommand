@@ -15,7 +15,7 @@ def _make_property(**overrides) -> Property:
         "state": "MD",
         "zip_code": "21401",
         "county": "Anne Arundel",
-        "property_type": PropertyType.sfh,
+        "property_type": PropertyType.SFH,
         "year_built": 2015,
         "roof_area_sqft": 1800.0,
         "assessed_value": 400000.0,
@@ -61,7 +61,7 @@ class TestComputeScore:
             tree_cover_pct=5,
             neighborhood_solar_pct=12,
             median_household_income=95000,
-            property_type=PropertyType.sfh,
+            property_type=PropertyType.SFH,
             has_existing_solar=False,
         )
         result = compute_score(prop)
@@ -77,7 +77,7 @@ class TestComputeScore:
             tree_cover_pct=75,
             neighborhood_solar_pct=0.5,
             median_household_income=30000,
-            property_type=PropertyType.condo,
+            property_type=PropertyType.CONDO,
             has_existing_solar=True,
         )
         result = compute_score(prop)
@@ -103,8 +103,8 @@ class TestComputeScore:
         assert compute_score(has_solar).existing_solar_score == 0
 
     def test_sfh_scores_higher_than_townhome(self):
-        sfh = _make_property(property_type=PropertyType.sfh)
-        town = _make_property(property_type=PropertyType.townhome)
+        sfh = _make_property(property_type=PropertyType.SFH)
+        town = _make_property(property_type=PropertyType.TOWNHOME)
         assert compute_score(sfh).property_type_score > compute_score(town).property_type_score
 
     def test_none_values_handled_gracefully(self):

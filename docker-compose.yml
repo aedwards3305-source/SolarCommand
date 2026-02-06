@@ -43,9 +43,10 @@ services:
       redis:
         condition: service_healthy
     command: >
-      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+      sh -c "alembic upgrade head && PGPASSWORD=solar psql -h db -U solar -d solarcommand -f /seed/seed.sql && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
     volumes:
       - ./backend:/app
+      - ./infrastructure/seed.sql:/seed/seed.sql
 
   worker:
     build:

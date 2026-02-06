@@ -94,11 +94,11 @@ class UserRole(str, enum.Enum):
 
 
 class PropertyType(str, enum.Enum):
-    sfh = "SFH"
-    townhome = "TOWNHOME"
-    condo = "CONDO"
-    multi_family = "MULTI_FAMILY"
-    other = "OTHER"
+    SFH = "SFH"
+    TOWNHOME = "TOWNHOME"
+    CONDO = "CONDO"
+    MULTI_FAMILY = "MULTI_FAMILY"
+    OTHER = "OTHER"
 
 
 # ── Models ─────────────────────────────────────────────────────────────────
@@ -118,7 +118,7 @@ class Property(Base):
 
     # Property details
     property_type: Mapped[PropertyType] = mapped_column(
-        Enum(PropertyType), default=PropertyType.sfh
+        Enum(PropertyType), default=PropertyType.SFH
     )
     year_built: Mapped[int | None] = mapped_column(Integer)
     roof_area_sqft: Mapped[float | None] = mapped_column(Float)

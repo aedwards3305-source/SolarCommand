@@ -103,7 +103,7 @@ async def ingest_property(payload: PropertyIngest, db: AsyncSession = Depends(ge
     try:
         prop_type = PropertyType(payload.property_type)
     except ValueError:
-        prop_type = PropertyType.other
+        prop_type = PropertyType.OTHER
 
     prop = Property(
         address_line1=payload.address_line1,

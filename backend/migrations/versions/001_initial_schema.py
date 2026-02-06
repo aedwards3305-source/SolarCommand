@@ -21,39 +21,39 @@ def upgrade() -> None:
     # ── Enums ──
     property_type = postgresql.ENUM(
         "SFH", "TOWNHOME", "CONDO", "MULTI_FAMILY", "OTHER",
-        name="propertytype", create_type=True,
+        name="propertytype", create_type=False,
     )
     lead_status = postgresql.ENUM(
         "ingested", "scored", "hot", "warm", "cool", "contacting", "contacted",
         "qualified", "appointment_set", "nurturing", "closed_won", "closed_lost",
         "disqualified", "dnc", "archived",
-        name="leadstatus", create_type=True,
+        name="leadstatus", create_type=False,
     )
     contact_channel = postgresql.ENUM(
         "voice", "sms", "email",
-        name="contactchannel", create_type=True,
+        name="contactchannel", create_type=False,
     )
     contact_disposition = postgresql.ENUM(
         "appointment_booked", "callback_scheduled", "interested_not_ready",
         "not_interested", "not_homeowner", "wrong_number", "voicemail",
         "no_answer", "do_not_call", "completed", "failed",
-        name="contactdisposition", create_type=True,
+        name="contactdisposition", create_type=False,
     )
     consent_status = postgresql.ENUM(
         "opted_in", "opted_out", "pending", "revoked",
-        name="consentstatus", create_type=True,
+        name="consentstatus", create_type=False,
     )
     consent_type = postgresql.ENUM(
         "voice_call", "sms", "email", "all_channels",
-        name="consenttype", create_type=True,
+        name="consenttype", create_type=False,
     )
     appointment_status = postgresql.ENUM(
         "scheduled", "confirmed", "completed", "no_show", "cancelled", "rescheduled",
-        name="appointmentstatus", create_type=True,
+        name="appointmentstatus", create_type=False,
     )
     user_role = postgresql.ENUM(
         "admin", "rep", "ops",
-        name="userrole", create_type=True,
+        name="userrole", create_type=False,
     )
 
     # Create all enum types
