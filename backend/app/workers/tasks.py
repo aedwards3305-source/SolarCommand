@@ -102,16 +102,23 @@ def _simulate_outreach(db: Session, attempt: OutreachAttempt):
         lead.total_call_attempts += 1
         lead.last_contacted_at = now
 
-        # Update lead status based on disposition
-        status_map = {
-            ContactDisposition.appointment_booked: LeadStatus.qualified,
-            ContactDisposition.interested_not_ready: LeadStatus.nurturing,
-            ContactDisposition.not_interested: LeadStatus.closed_lost,
-            ContactDisposition.no_answer: LeadStatus.contacting,
-            ContactDisposition.voicemail: LeadStatus.contacting,
-            ContactDisposition.wrong_number: LeadStatus.disqualified,
+        # Update lead status based on disposition — but never downgrade
+        # from appointment_set, qualified, or closed_won
+        protected_statuses = {
+            LeadStatus.appointment_set,
+            LeadStatus.qualified,
+            LeadStatus.closed_won,
         }
-        lead.status = status_map.get(chosen, LeadStatus.contacting)
+        if lead.status not in protected_statuses:
+            status_map = {
+                ContactDisposition.appointment_booked: LeadStatus.qualified,
+                ContactDisposition.interested_not_ready: LeadStatus.nurturing,
+                ContactDisposition.not_interested: LeadStatus.closed_lost,
+                ContactDisposition.no_answer: LeadStatus.contacting,
+                ContactDisposition.voicemail: LeadStatus.contacting,
+                ContactDisposition.wrong_number: LeadStatus.disqualified,
+            }
+            lead.status = status_map.get(chosen, LeadStatus.contacting)
 
     elif attempt.channel == ContactChannel.sms:
         attempt.disposition = ContactDisposition.completed
