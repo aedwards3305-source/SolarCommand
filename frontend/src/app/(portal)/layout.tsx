@@ -33,7 +33,7 @@ export default function PortalLayout({
       {/* Footer */}
       <footer className="border-t border-gray-200 bg-solar-900 text-gray-300">
         <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
-          <div className="mb-8 flex justify-center">
+          <div className="mb-8 flex justify-start">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/solar-command-logo.png"
