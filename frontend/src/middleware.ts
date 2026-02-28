@@ -18,6 +18,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Allow static assets (images, fonts, etc.) served from /public
+  if (/\.(png|jpg|jpeg|gif|svg|ico|webp|woff2?|ttf|css|js|map)$/i.test(pathname)) {
+    return NextResponse.next();
+  }
+
   // Check for auth token in cookie or localStorage isn't available in middleware,
   // so we check the cookie that the auth provider sets
   const token =
