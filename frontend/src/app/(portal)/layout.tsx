@@ -41,7 +41,7 @@ export default function PortalLayout({
                 alt="Solar Command"
                 width={280}
                 height={360}
-                className="h-52 w-auto object-contain sm:h-72"
+                className="h-[26rem] w-auto object-contain sm:h-[36rem]"
               />
             </div>
             <div>
