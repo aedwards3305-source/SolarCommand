@@ -21,11 +21,11 @@ export default function PortalLayout({
           <Link href="/solar" className="flex items-center gap-3 flex-shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/solar-command-logo.jpg"
+              src="/solar-command-logo.png"
               alt="Solar Command"
-              width={40}
-              height={40}
-              className="h-10 w-10 rounded-md object-contain"
+              width={44}
+              height={44}
+              className="h-11 w-11 object-contain"
             />
             <span className="text-lg font-bold text-white sm:text-xl">Solar Command</span>
           </Link>
