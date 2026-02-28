@@ -39,9 +39,9 @@ export default function PortalLayout({
               <img
                 src="/solar-command-logo.png"
                 alt="Solar Command"
-                width={120}
-                height={150}
-                className="h-28 w-auto object-contain sm:h-36"
+                width={280}
+                height={360}
+                className="h-52 w-auto object-contain sm:h-72"
               />
             </div>
             <div>
