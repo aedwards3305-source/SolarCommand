@@ -18,15 +18,7 @@ export default function SolarHomePage() {
           <div className="absolute -bottom-20 -left-20 h-[300px] w-[300px] rounded-full bg-fuchsia-400 blur-3xl" />
         </div>
         <div className="relative mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-24">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/solar-command-logo.png"
-            alt="Solar Command"
-            width={120}
-            height={120}
-            className="mx-auto h-28 w-28 object-contain sm:h-32 sm:w-32"
-          />
-          <h1 className="mt-6 text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-8xl">
+          <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-8xl">
             Achieve Energy Independence
           </h1>
           <p className="mt-4 text-xl font-medium text-solar-200 sm:text-2xl lg:text-3xl">

@@ -17,17 +17,16 @@ export default function PortalLayout({
     <div className="min-h-screen flex flex-col bg-white">
       {/* Header — blue banner */}
       <header className="relative border-b border-solar-800/30 bg-solar-700 sticky top-0 z-30">
-        <div className="mx-auto max-w-6xl flex items-center px-4 py-3 sm:px-6">
-          <Link href="/solar" className="flex items-center gap-3 flex-shrink-0">
+        <div className="mx-auto max-w-6xl flex items-center px-4 py-2 sm:px-6 sm:py-3">
+          <Link href="/solar" className="flex items-center flex-shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/solar-command-logo.png"
               alt="Solar Command"
-              width={44}
-              height={44}
-              className="h-11 w-11 object-contain"
+              width={200}
+              height={64}
+              className="h-14 w-auto object-contain sm:h-16"
             />
-            <span className="text-lg font-bold text-white sm:text-xl">Solar Command</span>
           </Link>
           <PortalNav />
         </div>
