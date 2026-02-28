@@ -51,10 +51,10 @@ export default function GetQuotePage() {
           <div className="absolute -bottom-20 -left-20 h-[300px] w-[300px] rounded-full bg-fuchsia-400 blur-3xl" />
         </div>
         <div className="relative mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 sm:py-20">
-          <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
+          <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl">
             Get Your Free Solar Quote
           </h1>
-          <p className="mt-4 text-lg text-solar-100 sm:text-xl">
+          <p className="mt-4 text-xl text-solar-100 sm:text-2xl">
             No obligation. No pressure. Just honest solar savings numbers.
           </p>
         </div>
@@ -64,7 +64,7 @@ export default function GetQuotePage() {
       <section className="border-b border-gray-100 bg-white py-5">
         <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-3 px-4 sm:px-6">
           {/* 25-Year Warranty */}
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3.5 py-1.5 text-xs font-medium text-solar-700">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3.5 py-1.5 text-sm font-medium text-solar-700">
             <svg
               width={14}
               height={14}
@@ -84,7 +84,7 @@ export default function GetQuotePage() {
           </span>
 
           {/* Authorized Dealer */}
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3.5 py-1.5 text-xs font-medium text-solar-700">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3.5 py-1.5 text-sm font-medium text-solar-700">
             <svg
               width={14}
               height={14}
@@ -104,7 +104,7 @@ export default function GetQuotePage() {
           </span>
 
           {/* MHIC License */}
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3.5 py-1.5 text-xs font-medium text-solar-700">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3.5 py-1.5 text-sm font-medium text-solar-700">
             <svg
               width={14}
               height={14}
@@ -124,7 +124,7 @@ export default function GetQuotePage() {
           </span>
 
           {/* $0 Down */}
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3.5 py-1.5 text-xs font-medium text-solar-700">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3.5 py-1.5 text-sm font-medium text-solar-700">
             <svg
               width={14}
               height={14}
@@ -150,7 +150,7 @@ export default function GetQuotePage() {
         <div className="mx-auto max-w-2xl px-4 sm:px-6">
           <div className="rounded-2xl bg-white p-6 shadow-lg border border-gray-200 sm:p-8">
             {error && (
-              <div className="mb-5 rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700 flex items-start gap-2">
+              <div className="mb-5 rounded-lg bg-red-50 border border-red-200 p-3 text-base text-red-700 flex items-start gap-2">
                 <svg
                   width={18}
                   height={18}
@@ -174,7 +174,7 @@ export default function GetQuotePage() {
               {/* First Name + Last Name */}
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-solar-700 mb-1">
+                  <label className="block text-base font-medium text-solar-700 mb-1">
                     First Name
                   </label>
                   <input
@@ -182,12 +182,12 @@ export default function GetQuotePage() {
                     required
                     value={form.first_name}
                     onChange={(e) => updateField("first_name", e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-solar-500 focus:border-solar-500 outline-none"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-3 text-base focus:ring-2 focus:ring-solar-500 focus:border-solar-500 outline-none"
                     placeholder="John"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-solar-700 mb-1">
+                  <label className="block text-base font-medium text-solar-700 mb-1">
                     Last Name
                   </label>
                   <input
@@ -195,7 +195,7 @@ export default function GetQuotePage() {
                     required
                     value={form.last_name}
                     onChange={(e) => updateField("last_name", e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-solar-500 focus:border-solar-500 outline-none"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-3 text-base focus:ring-2 focus:ring-solar-500 focus:border-solar-500 outline-none"
                     placeholder="Smith"
                   />
                 </div>
@@ -204,7 +204,7 @@ export default function GetQuotePage() {
               {/* Phone + Email */}
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-solar-700 mb-1">
+                  <label className="block text-base font-medium text-solar-700 mb-1">
                     Phone
                   </label>
                   <input
@@ -212,12 +212,12 @@ export default function GetQuotePage() {
                     required
                     value={form.phone}
                     onChange={(e) => updateField("phone", e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-solar-500 focus:border-solar-500 outline-none"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-3 text-base focus:ring-2 focus:ring-solar-500 focus:border-solar-500 outline-none"
                     placeholder="(555) 123-4567"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-solar-700 mb-1">
+                  <label className="block text-base font-medium text-solar-700 mb-1">
                     Email
                   </label>
                   <input
@@ -225,7 +225,7 @@ export default function GetQuotePage() {
                     required
                     value={form.email}
                     onChange={(e) => updateField("email", e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-solar-500 focus:border-solar-500 outline-none"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-3 text-base focus:ring-2 focus:ring-solar-500 focus:border-solar-500 outline-none"
                     placeholder="john@example.com"
                   />
                 </div>
@@ -233,7 +233,7 @@ export default function GetQuotePage() {
 
               {/* Street Address */}
               <div className="mt-4">
-                <label className="block text-sm font-medium text-solar-700 mb-1">
+                <label className="block text-base font-medium text-solar-700 mb-1">
                   Street Address
                 </label>
                 <input
@@ -241,7 +241,7 @@ export default function GetQuotePage() {
                   required
                   value={form.address}
                   onChange={(e) => updateField("address", e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-solar-500 focus:border-solar-500 outline-none"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-3 text-base focus:ring-2 focus:ring-solar-500 focus:border-solar-500 outline-none"
                   placeholder="123 Main Street"
                 />
               </div>
@@ -249,7 +249,7 @@ export default function GetQuotePage() {
               {/* City + State + Zip Code */}
               <div className="mt-4 grid gap-4 sm:grid-cols-3">
                 <div>
-                  <label className="block text-sm font-medium text-solar-700 mb-1">
+                  <label className="block text-base font-medium text-solar-700 mb-1">
                     City
                   </label>
                   <input
@@ -257,12 +257,12 @@ export default function GetQuotePage() {
                     required
                     value={form.city}
                     onChange={(e) => updateField("city", e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-solar-500 focus:border-solar-500 outline-none"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-3 text-base focus:ring-2 focus:ring-solar-500 focus:border-solar-500 outline-none"
                     placeholder="Baltimore"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-solar-700 mb-1">
+                  <label className="block text-base font-medium text-solar-700 mb-1">
                     State
                   </label>
                   <input
@@ -270,12 +270,12 @@ export default function GetQuotePage() {
                     readOnly
                     value="Maryland"
                     tabIndex={-1}
-                    className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-600 cursor-not-allowed outline-none"
+                    className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-3 text-base text-gray-600 cursor-not-allowed outline-none"
                   />
                   <input type="hidden" name="state" value="MD" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-solar-700 mb-1">
+                  <label className="block text-base font-medium text-solar-700 mb-1">
                     Zip Code
                   </label>
                   <input
@@ -283,7 +283,7 @@ export default function GetQuotePage() {
                     required
                     value={form.zip_code}
                     onChange={(e) => updateField("zip_code", e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-solar-500 focus:border-solar-500 outline-none"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-3 text-base focus:ring-2 focus:ring-solar-500 focus:border-solar-500 outline-none"
                     placeholder="21201"
                   />
                 </div>
@@ -293,13 +293,13 @@ export default function GetQuotePage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="mt-6 w-full rounded-lg bg-solar-600 px-6 py-3 text-base font-bold text-white hover:bg-solar-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="mt-6 w-full rounded-lg bg-solar-600 px-6 py-4 text-xl font-bold text-white hover:bg-solar-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? "Submitting..." : "Get My Free Quote"}
               </button>
 
               {/* Consent */}
-              <p className="mt-3 text-center text-xs text-gray-400">
+              <p className="mt-3 text-center text-sm text-gray-400">
                 By submitting, you consent to receive calls and texts about your
                 solar quote. No purchase required. MHIC #165263.
               </p>
@@ -312,15 +312,15 @@ export default function GetQuotePage() {
       <section className="pb-16 sm:pb-20">
         <div className="mx-auto max-w-2xl px-4 sm:px-6">
           <div className="rounded-xl bg-solar-50 border border-solar-200 p-6 text-center">
-            <p className="text-base font-semibold text-amber-600">
+            <p className="text-xl font-semibold text-amber-600">
               Want to learn more first?
             </p>
-            <p className="mt-1 text-sm text-solar-700">
+            <p className="mt-1 text-base text-solar-700">
               Discover our 25-year warranty, certified installers, and the 6-step process.
             </p>
             <a
               href="/solar/why-solar-command"
-              className="mt-4 inline-flex items-center gap-2 rounded-full bg-solar-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-solar-700 transition-colors"
+              className="mt-4 inline-flex items-center gap-2 rounded-full bg-solar-600 px-6 py-2.5 text-base font-bold text-white hover:bg-solar-700 transition-colors"
             >
               Why Solar Command
             </a>

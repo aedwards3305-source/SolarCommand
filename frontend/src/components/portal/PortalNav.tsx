@@ -27,10 +27,10 @@ export default function PortalNav() {
           <Link
             key={link.href}
             href={link.href}
-            className={`whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+            className={`whitespace-nowrap rounded-md px-3 py-1.5 text-base font-medium transition-colors ${
               isActive(link.href)
-                ? "bg-solar-100 text-solar-700"
-                : "text-gray-600 hover:text-solar-600 hover:bg-gray-50"
+                ? "bg-white/20 text-white"
+                : "text-white/80 hover:text-white hover:bg-white/10"
             }`}
           >
             {link.label}
@@ -38,10 +38,10 @@ export default function PortalNav() {
         ))}
         <Link
           href="/solar/get-quote"
-          className={`ml-auto whitespace-nowrap rounded-full px-5 py-1.5 text-sm font-bold transition-colors ${
+          className={`ml-auto whitespace-nowrap rounded-full px-6 py-2 text-base font-bold transition-colors ${
             isActive("/solar/get-quote")
-              ? "bg-solar-700 text-white"
-              : "bg-solar-600 text-white hover:bg-solar-700"
+              ? "bg-white text-solar-700"
+              : "bg-white text-solar-700 hover:bg-solar-50"
           }`}
         >
           Get a Quote
@@ -51,13 +51,13 @@ export default function PortalNav() {
       {/* Mobile hamburger */}
       <button
         onClick={() => setOpen(!open)}
-        className="md:hidden ml-auto p-2 text-gray-600 hover:text-gray-900 rounded-md hover:bg-gray-100 transition-colors"
+        className="md:hidden ml-auto p-2 text-white/80 hover:text-white rounded-md hover:bg-white/10 transition-colors"
         aria-label="Toggle menu"
       >
         <svg
-          width={22}
-          height={22}
-          className="h-[22px] w-[22px]"
+          width={24}
+          height={24}
+          className="h-6 w-6"
           fill="none"
           viewBox="0 0 24 24"
           strokeWidth={2}
@@ -73,17 +73,17 @@ export default function PortalNav() {
 
       {/* Mobile dropdown */}
       {open && (
-        <div className="md:hidden absolute top-full left-0 right-0 border-t border-gray-100 bg-white shadow-lg z-40">
+        <div className="md:hidden absolute top-full left-0 right-0 border-t border-solar-800/30 bg-solar-700 shadow-lg z-40">
           <div className="flex flex-col px-4 py-3 gap-1">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className={`rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                className={`rounded-lg px-3 py-3 text-base font-medium transition-colors ${
                   isActive(link.href)
-                    ? "bg-solar-100 text-solar-700"
-                    : "text-gray-700 hover:bg-gray-50"
+                    ? "bg-white/20 text-white"
+                    : "text-white/80 hover:bg-white/10 hover:text-white"
                 }`}
               >
                 {link.label}
@@ -92,7 +92,7 @@ export default function PortalNav() {
             <Link
               href="/solar/get-quote"
               onClick={() => setOpen(false)}
-              className="mt-1 rounded-lg bg-solar-600 px-3 py-2.5 text-center text-sm font-bold text-white hover:bg-solar-700 transition-colors"
+              className="mt-1 rounded-lg bg-white px-3 py-3 text-center text-base font-bold text-solar-700 hover:bg-solar-50 transition-colors"
             >
               Get a Quote
             </Link>

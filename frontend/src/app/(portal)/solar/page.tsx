@@ -17,50 +17,34 @@ export default function SolarHomePage() {
           <div className="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-solar-400 blur-3xl" />
           <div className="absolute -bottom-20 -left-20 h-[300px] w-[300px] rounded-full bg-fuchsia-400 blur-3xl" />
         </div>
-        <div className="relative mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-20">
-          <div className="grid items-center gap-8 lg:grid-cols-2">
-            <div className="text-center lg:text-left">
-              <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl">
-                Achieve Energy Independence
-              </h1>
-              <p className="mt-3 text-lg font-medium text-solar-200 sm:text-xl">
-                Meeting the Highest Standards in the Solar System
-              </p>
-              <p className="mt-4 max-w-lg text-lg text-solar-100 sm:text-xl">
-                Solar Command installs premium Sunburst Solar systems with a
-                comprehensive 25-year warranty, Enphase battery backup, and $0
-                down financing — proudly serving Maryland.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3 justify-center lg:justify-start">
-                <Link
-                  href="/solar/get-quote"
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-lg font-bold text-solar-700 shadow-lg hover:bg-solar-50 transition-colors"
-                >
-                  Schedule an Appointment
-                </Link>
-                <Link
-                  href="/solar/why-solar-command"
-                  className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-7 py-3.5 text-lg font-semibold backdrop-blur-sm hover:bg-white/20 transition-colors"
-                >
-                  Learn More
-                </Link>
-              </div>
-            </div>
-            <div className="relative mx-auto w-full max-w-md lg:max-w-none">
-              <div className="overflow-hidden rounded-2xl shadow-2xl">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/commercial-hero.png"
-                  alt="Solar Command commercial solar panel installation"
-                  width={600}
-                  height={400}
-                  className="h-auto w-full object-cover"
-                />
-              </div>
-            </div>
+        <div className="relative mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-24">
+          <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-8xl">
+            Achieve Energy Independence
+          </h1>
+          <p className="mt-4 text-xl font-medium text-solar-200 sm:text-2xl lg:text-3xl">
+            Meeting the Highest Standards in the Solar System
+          </p>
+          <p className="mx-auto mt-5 max-w-2xl text-xl text-solar-100 sm:text-2xl leading-relaxed">
+            Solar Command installs premium Sunburst Solar systems with a
+            comprehensive 25-year warranty, Enphase battery backup, and $0
+            down financing — proudly serving Maryland.
+          </p>
+          <div className="mt-10 flex flex-wrap gap-4 justify-center">
+            <Link
+              href="/solar/get-quote"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-10 py-4 text-xl font-bold text-solar-700 shadow-lg hover:bg-solar-50 transition-colors"
+            >
+              Schedule an Appointment
+            </Link>
+            <Link
+              href="/solar/why-solar-command"
+              className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-9 py-4 text-xl font-semibold backdrop-blur-sm hover:bg-white/20 transition-colors"
+            >
+              Learn More
+            </Link>
           </div>
           {/* Trust badges */}
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-3 text-sm lg:justify-start">
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
             {[
               "25-Year Warranty",
               "Authorized Sunburst Solar Dealer",
@@ -69,7 +53,7 @@ export default function SolarHomePage() {
             ].map((badge) => (
               <span
                 key={badge}
-                className="rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-xs font-medium backdrop-blur-sm"
+                className="rounded-full border border-white/30 bg-white/10 px-5 py-2 text-base font-medium backdrop-blur-sm"
               >
                 {badge}
               </span>
@@ -78,13 +62,29 @@ export default function SolarHomePage() {
         </div>
       </section>
 
+      {/* ── Hero Image ─────────────────────────────────────── */}
+      <section className="bg-white py-10 sm:py-14">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6">
+          <div className="overflow-hidden rounded-2xl shadow-2xl">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/commercial-hero.png"
+              alt="Solar Command commercial solar panel installation"
+              width={908}
+              height={592}
+              className="h-auto w-full object-cover"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* ── Make the Smart Investment ────────────────────────── */}
       <section className="bg-white py-16 sm:py-20">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <h2 className="text-center text-3xl font-bold text-amber-600 sm:text-4xl">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <h2 className="text-center text-4xl font-bold text-amber-600 sm:text-5xl">
             Make the Smart Investment: Go Solar!
           </h2>
-          <div className="mt-10 grid gap-8 sm:grid-cols-3">
+          <div className="mt-12 grid gap-8 sm:grid-cols-3">
             {[
               {
                 icon: "M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941",
@@ -106,15 +106,15 @@ export default function SolarHomePage() {
                 key={item.title}
                 className="rounded-xl bg-white p-8 text-center shadow-sm border border-gray-200"
               >
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-solar-100 text-solar-600">
-                  <svg width={32} height={32} className="h-8 w-8" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-solar-100 text-solar-600">
+                  <svg width={40} height={40} className="h-10 w-10" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
                   </svg>
                 </div>
-                <h3 className="mt-4 text-xl font-semibold text-amber-600">
+                <h3 className="mt-5 text-2xl font-semibold text-amber-600">
                   {item.title}
                 </h3>
-                <p className="mt-2 text-base text-solar-800 leading-relaxed">
+                <p className="mt-3 text-lg text-solar-800 leading-relaxed">
                   {item.desc}
                 </p>
               </div>
@@ -125,14 +125,14 @@ export default function SolarHomePage() {
 
       {/* ── Explore Our Services ─────────────────────────────── */}
       <section className="bg-white py-16 sm:py-20 border-t border-gray-100">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <h2 className="text-center text-3xl font-bold text-amber-600 sm:text-4xl">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <h2 className="text-center text-4xl font-bold text-amber-600 sm:text-5xl">
             Explore Our Services
           </h2>
-          <p className="mt-2 text-center text-lg text-solar-700">
+          <p className="mt-3 text-center text-xl text-solar-700 sm:text-2xl">
             Discover what Solar Command can do for your Maryland home
           </p>
-          <div className="mt-10 grid gap-6 sm:grid-cols-2">
+          <div className="mt-12 grid gap-6 sm:grid-cols-2">
             {[
               {
                 href: "/solar/why-solar-command",
@@ -166,23 +166,23 @@ export default function SolarHomePage() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="group flex gap-4 rounded-xl bg-white p-6 shadow-sm border border-gray-200 hover:shadow-md hover:border-solar-300 transition-all"
+                className="group flex gap-5 rounded-xl bg-white p-8 shadow-sm border border-gray-200 hover:shadow-md hover:border-solar-300 transition-all"
               >
-                <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl ${item.accent}`}>
-                  <svg width={24} height={24} className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <div className={`flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl ${item.accent}`}>
+                  <svg width={28} height={28} className="h-7 w-7" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-amber-600 group-hover:text-solar-600 transition-colors">
+                  <h3 className="text-xl font-semibold text-amber-600 group-hover:text-solar-600 transition-colors sm:text-2xl">
                     {item.title}
                   </h3>
-                  <p className="mt-1 text-base text-solar-800 leading-relaxed">
+                  <p className="mt-2 text-lg text-solar-800 leading-relaxed">
                     {item.desc}
                   </p>
-                  <span className="mt-2 inline-flex items-center gap-1 text-base font-medium text-solar-600">
+                  <span className="mt-3 inline-flex items-center gap-1.5 text-lg font-medium text-solar-600">
                     Learn more
-                    <svg width={14} height={14} className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <svg width={18} height={18} className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                     </svg>
                   </span>

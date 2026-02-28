@@ -150,10 +150,10 @@ export default function WhySolarPage() {
                   {benefit.icon}
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-amber-600">
+                  <h3 className="text-xl font-semibold text-amber-600">
                     {benefit.title}
                   </h3>
-                  <p className="mt-2 text-sm text-solar-700 leading-relaxed">
+                  <p className="mt-2 text-base text-solar-700 leading-relaxed">
                     {benefit.description}
                   </p>
                 </div>
@@ -166,20 +166,20 @@ export default function WhySolarPage() {
       {/* ── Section 2: Environmental Impact Stats ─────────────── */}
       <section className="bg-solar-900 py-14">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <h2 className="text-center text-2xl font-bold text-white sm:text-3xl">
+          <h2 className="text-center text-3xl font-bold text-white sm:text-4xl">
             Help Save the Planet with Solar
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-400">
+          <p className="mt-2 text-center text-base text-gray-400">
             Estimated environmental impact of our customers over 20 years
           </p>
           <div className="mt-10 grid gap-6 sm:grid-cols-3">
             {/* Trees Planted Equivalent */}
             <div className="text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-800">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gray-800">
                 <svg
-                  width={24}
-                  height={24}
-                  className="h-6 w-6 text-green-400"
+                  width={28}
+                  height={28}
+                  className="h-7 w-7 text-green-400"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
@@ -192,21 +192,21 @@ export default function WhySolarPage() {
                   />
                 </svg>
               </div>
-              <p className="mt-4 text-3xl font-extrabold text-green-400 sm:text-4xl">
+              <p className="mt-4 text-4xl font-extrabold text-green-400 sm:text-5xl">
                 498,000
               </p>
-              <p className="mt-1 text-sm text-gray-400">
+              <p className="mt-1 text-base text-gray-400">
                 Trees Planted Equivalent
               </p>
             </div>
 
             {/* Gallons of Gas Saved */}
             <div className="text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-800">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gray-800">
                 <svg
-                  width={24}
-                  height={24}
-                  className="h-6 w-6 text-solar-400"
+                  width={28}
+                  height={28}
+                  className="h-7 w-7 text-solar-400"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
@@ -219,21 +219,21 @@ export default function WhySolarPage() {
                   />
                 </svg>
               </div>
-              <p className="mt-4 text-3xl font-extrabold text-solar-400 sm:text-4xl">
+              <p className="mt-4 text-4xl font-extrabold text-solar-400 sm:text-5xl">
                 395,400
               </p>
-              <p className="mt-1 text-sm text-gray-400">
+              <p className="mt-1 text-base text-gray-400">
                 Gallons of Gas Saved
               </p>
             </div>
 
             {/* Miles of Driving Reduced */}
             <div className="text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-800">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gray-800">
                 <svg
-                  width={24}
-                  height={24}
-                  className="h-6 w-6 text-sunburst-400"
+                  width={28}
+                  height={28}
+                  className="h-7 w-7 text-sunburst-400"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
@@ -246,10 +246,10 @@ export default function WhySolarPage() {
                   />
                 </svg>
               </div>
-              <p className="mt-4 text-3xl font-extrabold text-sunburst-400 sm:text-4xl">
+              <p className="mt-4 text-4xl font-extrabold text-sunburst-400 sm:text-5xl">
                 8,421,560
               </p>
-              <p className="mt-1 text-sm text-gray-400">
+              <p className="mt-1 text-base text-gray-400">
                 Miles of Driving Reduced
               </p>
             </div>
@@ -260,10 +260,10 @@ export default function WhySolarPage() {
       {/* ── Section 3: CTA Text ───────────────────────────────── */}
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
-          <h2 className="text-3xl font-bold text-amber-600">
+          <h2 className="text-4xl font-bold text-amber-600">
             Start Your Solar Journey Today
           </h2>
-          <p className="mt-4 text-lg text-solar-700 leading-relaxed">
+          <p className="mt-4 text-xl text-solar-700 leading-relaxed">
             Maryland homeowners are saving thousands with solar energy. Join them
             today.
           </p>

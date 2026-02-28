@@ -21,7 +21,7 @@ export default function BatteriesPage() {
       {/* ── 1. What Are Solar Batteries ───────────────────────── */}
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <h2 className="text-center text-3xl font-bold text-amber-600">
+          <h2 className="text-center text-4xl font-bold text-amber-600">
             What Are Solar Batteries?
           </h2>
           <div className="mx-auto mt-6 max-w-3xl space-y-4 text-solar-700 leading-relaxed">
@@ -55,7 +55,7 @@ export default function BatteriesPage() {
       {/* ── 2. Enphase IQ Battery ─────────────────────────────── */}
       <section className="bg-white border-t border-gray-100 py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <h2 className="text-center text-3xl font-bold text-amber-600">
+          <h2 className="text-center text-4xl font-bold text-amber-600">
             Why We Recommend the Enphase IQ Battery
           </h2>
           <p className="mt-2 text-center text-solar-700">
@@ -81,10 +81,10 @@ export default function BatteriesPage() {
                   />
                 </svg>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-amber-600">
+              <h3 className="mt-4 text-xl font-semibold text-amber-600">
                 Enhanced Power Output
               </h3>
-              <p className="mt-2 text-sm text-solar-700 leading-relaxed">
+              <p className="mt-2 text-base text-solar-700 leading-relaxed">
                 Run high-demand appliances like AC units and refrigerators even
                 during outages.
               </p>
@@ -109,10 +109,10 @@ export default function BatteriesPage() {
                   />
                 </svg>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-amber-600">
+              <h3 className="mt-4 text-xl font-semibold text-amber-600">
                 High Storage Capacity
               </h3>
-              <p className="mt-2 text-sm text-solar-700 leading-relaxed">
+              <p className="mt-2 text-base text-solar-700 leading-relaxed">
                 Power major home appliances for hours during grid failures.
                 Enough capacity for your essential needs.
               </p>
@@ -137,10 +137,10 @@ export default function BatteriesPage() {
                   />
                 </svg>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-amber-600">
+              <h3 className="mt-4 text-xl font-semibold text-amber-600">
                 Mobile App Monitoring
               </h3>
-              <p className="mt-2 text-sm text-solar-700 leading-relaxed">
+              <p className="mt-2 text-base text-solar-700 leading-relaxed">
                 Track your energy production, storage levels, and consumption in
                 real-time from your phone.
               </p>
@@ -152,7 +152,7 @@ export default function BatteriesPage() {
       {/* ── 3. Benefits of Solar Battery Storage ──────────────── */}
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <h2 className="text-center text-3xl font-bold text-amber-600">
+          <h2 className="text-center text-4xl font-bold text-amber-600">
             Benefits of Solar Battery Storage
           </h2>
           <div className="mt-10 grid gap-8 sm:grid-cols-3">
@@ -175,10 +175,10 @@ export default function BatteriesPage() {
                   />
                 </svg>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-amber-600">
+              <h3 className="mt-4 text-xl font-semibold text-amber-600">
                 Energy Independence
               </h3>
-              <p className="mt-2 text-sm text-solar-700 leading-relaxed">
+              <p className="mt-2 text-base text-solar-700 leading-relaxed">
                 Backup power when sunlight or grid access is unavailable. Never
                 worry about blackouts again.
               </p>
@@ -203,10 +203,10 @@ export default function BatteriesPage() {
                   />
                 </svg>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-amber-600">
+              <h3 className="mt-4 text-xl font-semibold text-amber-600">
                 Financial Savings
               </h3>
-              <p className="mt-2 text-sm text-solar-700 leading-relaxed">
+              <p className="mt-2 text-base text-solar-700 leading-relaxed">
                 Use stored energy during peak utility rate hours to reduce your
                 electricity costs. Avoid expensive time-of-use charges.
               </p>
@@ -231,10 +231,10 @@ export default function BatteriesPage() {
                   />
                 </svg>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-amber-600">
+              <h3 className="mt-4 text-xl font-semibold text-amber-600">
                 Environmental Impact
               </h3>
-              <p className="mt-2 text-sm text-solar-700 leading-relaxed">
+              <p className="mt-2 text-base text-solar-700 leading-relaxed">
                 Increase your use of clean, renewable energy and reduce reliance
                 on fossil-fuel-powered grid electricity.
               </p>
@@ -264,17 +264,17 @@ export default function BatteriesPage() {
                 />
               </svg>
             </div>
-            <h2 className="mt-6 text-2xl font-bold text-white sm:text-3xl">
+            <h2 className="mt-6 text-3xl font-bold text-white sm:text-4xl">
               Save 30% with the Federal Tax Credit
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-300 leading-relaxed">
+            <p className="mx-auto mt-4 max-w-2xl text-xl text-gray-300 leading-relaxed">
               Solar batteries are eligible for the 30% federal tax credit, just
               like your solar panels. Battery systems can also be added to
               existing solar installations — so even if you already have panels
               on your roof, you can still take advantage of this significant
               savings when you add battery storage.
             </p>
-            <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-solar-500/20 px-5 py-2 text-sm font-medium text-solar-300">
+            <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-solar-500/20 px-5 py-2 text-base font-medium text-solar-300">
               <svg
                 width={16}
                 height={16}
@@ -299,7 +299,7 @@ export default function BatteriesPage() {
       {/* ── 5. 3-Step Installation Process ────────────────────── */}
       <section className="bg-white border-t border-gray-100 py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <h2 className="text-center text-3xl font-bold text-amber-600">
+          <h2 className="text-center text-4xl font-bold text-amber-600">
             How Do I Get Solar Batteries Installed?
           </h2>
           <p className="mt-2 text-center text-solar-700">
@@ -308,13 +308,13 @@ export default function BatteriesPage() {
           <div className="mt-12 grid gap-8 sm:grid-cols-3">
             {/* Step 1 */}
             <div className="flex flex-col items-center text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-solar-600 text-lg font-bold text-white">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-solar-600 text-xl font-bold text-white">
                 1
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-amber-600">
+              <h3 className="mt-4 text-xl font-semibold text-amber-600">
                 Free Energy Assessment
               </h3>
-              <p className="mt-2 text-sm text-solar-700 leading-relaxed">
+              <p className="mt-2 text-base text-solar-700 leading-relaxed">
                 We evaluate your energy storage needs based on your home size,
                 usage patterns, and backup requirements.
               </p>
@@ -322,13 +322,13 @@ export default function BatteriesPage() {
 
             {/* Step 2 */}
             <div className="flex flex-col items-center text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-solar-600 text-lg font-bold text-white">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-solar-600 text-xl font-bold text-white">
                 2
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-amber-600">
+              <h3 className="mt-4 text-xl font-semibold text-amber-600">
                 Customized Recommendation
               </h3>
-              <p className="mt-2 text-sm text-solar-700 leading-relaxed">
+              <p className="mt-2 text-base text-solar-700 leading-relaxed">
                 We recommend the right battery configuration for your home,
                 including capacity and number of units.
               </p>
@@ -336,13 +336,13 @@ export default function BatteriesPage() {
 
             {/* Step 3 */}
             <div className="flex flex-col items-center text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-solar-600 text-lg font-bold text-white">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-solar-600 text-xl font-bold text-white">
                 3
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-amber-600">
+              <h3 className="mt-4 text-xl font-semibold text-amber-600">
                 Expert Installation
               </h3>
-              <p className="mt-2 text-sm text-solar-700 leading-relaxed">
+              <p className="mt-2 text-base text-solar-700 leading-relaxed">
                 Our factory-trained technicians seamlessly integrate the battery
                 with your solar system.
               </p>

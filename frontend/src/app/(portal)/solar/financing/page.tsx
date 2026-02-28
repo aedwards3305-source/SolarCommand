@@ -91,17 +91,17 @@ export default function SolarFinancingPage() {
       {/* ── Section 1: Financing vs Leasing ────────────────────── */}
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <h2 className="text-center text-3xl font-bold text-amber-600">
+          <h2 className="text-center text-4xl font-bold text-amber-600">
             Financing vs. Leasing
           </h2>
           <div className="mt-10 grid gap-8 sm:grid-cols-2">
             {/* Financing Card */}
             <div className="rounded-xl border border-gray-200 border-t-4 border-t-solar-500 bg-white p-6 shadow-sm">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-solar-100 text-solar-600">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-solar-100 text-solar-600">
                   <svg
-                    width={24}
-                    height={24}
+                    width={28}
+                    height={28}
                     viewBox="0 0 24 24"
                     fill="none"
                     strokeWidth={1.5}
@@ -115,8 +115,8 @@ export default function SolarFinancingPage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-amber-600">Financing</h3>
-                  <p className="text-sm font-medium text-solar-600">
+                  <h3 className="text-2xl font-bold text-amber-600">Financing</h3>
+                  <p className="text-base font-medium text-solar-600">
                     Own Your System
                   </p>
                 </div>
@@ -139,7 +139,7 @@ export default function SolarFinancingPage() {
                         d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                    <span className="text-sm text-solar-700">{benefit}</span>
+                    <span className="text-base text-solar-700">{benefit}</span>
                   </li>
                 ))}
               </ul>
@@ -148,10 +148,10 @@ export default function SolarFinancingPage() {
             {/* Leasing Card */}
             <div className="rounded-xl border border-gray-200 border-t-4 border-t-sunburst-500 bg-white p-6 shadow-sm">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sunburst-100 text-sunburst-600">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-sunburst-100 text-sunburst-600">
                   <svg
-                    width={24}
-                    height={24}
+                    width={28}
+                    height={28}
                     viewBox="0 0 24 24"
                     fill="none"
                     strokeWidth={1.5}
@@ -165,8 +165,8 @@ export default function SolarFinancingPage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-amber-600">Leasing</h3>
-                  <p className="text-sm font-medium text-sunburst-600">
+                  <h3 className="text-2xl font-bold text-amber-600">Leasing</h3>
+                  <p className="text-base font-medium text-sunburst-600">
                     No Upfront Cost
                   </p>
                 </div>
@@ -189,7 +189,7 @@ export default function SolarFinancingPage() {
                         d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                    <span className="text-sm text-solar-700">{benefit}</span>
+                    <span className="text-base text-solar-700">{benefit}</span>
                   </li>
                 ))}
               </ul>
@@ -201,7 +201,7 @@ export default function SolarFinancingPage() {
       {/* ── Section 2: Types of Solar Financing ────────────────── */}
       <section className="bg-white border-t border-gray-100 py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <h2 className="text-center text-3xl font-bold text-amber-600">
+          <h2 className="text-center text-4xl font-bold text-amber-600">
             Types of Solar Financing &amp; Leasing
           </h2>
           <div className="mt-10 grid gap-6 sm:grid-cols-2">
@@ -210,10 +210,10 @@ export default function SolarFinancingPage() {
                 key={item.title}
                 className="rounded-xl bg-white p-6 shadow-sm border border-gray-200"
               >
-                <h3 className="text-lg font-semibold text-amber-600">
+                <h3 className="text-xl font-semibold text-amber-600">
                   {item.title}
                 </h3>
-                <p className="mt-2 text-sm text-solar-700 leading-relaxed">
+                <p className="mt-2 text-base text-solar-700 leading-relaxed">
                   {item.description}
                 </p>
               </div>
@@ -225,15 +225,15 @@ export default function SolarFinancingPage() {
       {/* ── Section 3: $0 Down Callout ─────────────────────────── */}
       <section className="bg-gradient-to-r from-solar-600 to-solar-700 py-16 sm:py-20">
         <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
-          <p className="text-5xl font-extrabold text-white sm:text-6xl">
+          <p className="text-6xl font-extrabold text-white sm:text-7xl">
             $0 Down to Get Started
           </p>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-solar-100 leading-relaxed">
+          <p className="mx-auto mt-4 max-w-2xl text-xl text-solar-100 leading-relaxed">
             Pay as little as zero down with no out-of-pocket costs for up to 60
             days after installation. Your price is guaranteed in writing for 60
             days.
           </p>
-          <p className="mt-4 text-sm font-medium text-solar-200">
+          <p className="mt-4 text-base font-medium text-solar-200">
             Backed by Blackstone and Truist, a multi-billion dollar financial
             institution.
           </p>
@@ -243,7 +243,7 @@ export default function SolarFinancingPage() {
       {/* ── Section 4: Payment Plans ───────────────────────────── */}
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <h2 className="text-center text-3xl font-bold text-amber-600">
+          <h2 className="text-center text-4xl font-bold text-amber-600">
             Choose Your Plan
           </h2>
           <div className="mt-10 grid gap-8 sm:grid-cols-3">
@@ -252,10 +252,10 @@ export default function SolarFinancingPage() {
                 key={plan.title}
                 className="rounded-xl bg-white p-6 shadow-sm border border-gray-200 flex flex-col"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-solar-100 text-solar-600">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-solar-100 text-solar-600">
                   <svg
-                    width={24}
-                    height={24}
+                    width={28}
+                    height={28}
                     viewBox="0 0 24 24"
                     fill="none"
                     strokeWidth={1.5}
@@ -268,15 +268,15 @@ export default function SolarFinancingPage() {
                     />
                   </svg>
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-amber-600">
+                <h3 className="mt-4 text-xl font-semibold text-amber-600">
                   {plan.title}
                 </h3>
-                <p className="mt-2 flex-1 text-sm text-solar-700 leading-relaxed">
+                <p className="mt-2 flex-1 text-base text-solar-700 leading-relaxed">
                   {plan.description}
                 </p>
                 <Link
                   href="/solar/get-quote"
-                  className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-solar-600 hover:text-solar-700 transition-colors"
+                  className="mt-5 inline-flex items-center gap-1 text-base font-semibold text-solar-600 hover:text-solar-700 transition-colors"
                 >
                   Learn More
                   <svg
@@ -303,17 +303,17 @@ export default function SolarFinancingPage() {
       {/* ── Section 5: Warranty Comparison ─────────────────────── */}
       <section className="bg-white border-t border-gray-100 py-16 sm:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          <h2 className="text-center text-3xl font-bold text-amber-600">
+          <h2 className="text-center text-4xl font-bold text-amber-600">
             Sunburst Solar Complete Confidence Warranty
           </h2>
           <div className="mt-10 overflow-hidden rounded-xl bg-white shadow-sm border border-gray-200">
             {/* Table Header */}
             <div className="grid grid-cols-3 border-b border-gray-200 bg-gray-50 px-6 py-4">
-              <p className="text-sm font-semibold text-amber-600">Feature</p>
-              <p className="text-center text-sm font-semibold text-solar-700">
+              <p className="text-base font-semibold text-amber-600">Feature</p>
+              <p className="text-center text-base font-semibold text-solar-700">
                 Sunburst Solar
               </p>
-              <p className="text-center text-sm font-semibold text-solar-700">
+              <p className="text-center text-base font-semibold text-solar-700">
                 Industry Standard
               </p>
             </div>
@@ -327,7 +327,7 @@ export default function SolarFinancingPage() {
                     : ""
                 }`}
               >
-                <p className="text-sm font-medium text-solar-800">
+                <p className="text-base font-medium text-solar-800">
                   {row.feature}
                 </p>
                 <div className="flex justify-center">
@@ -348,7 +348,7 @@ export default function SolarFinancingPage() {
                       />
                     </svg>
                   ) : (
-                    <span className="text-sm font-medium text-green-600">
+                    <span className="text-base font-medium text-green-600">
                       {String(row.sunburst)}
                     </span>
                   )}
@@ -371,7 +371,7 @@ export default function SolarFinancingPage() {
                       />
                     </svg>
                   ) : (
-                    <span className="text-sm font-medium text-solar-700">
+                    <span className="text-base font-medium text-solar-700">
                       {String(row.industry)}
                     </span>
                   )}

@@ -25,7 +25,7 @@ export default function SolarSavingsPage() {
           <div className="grid items-center gap-10 lg:grid-cols-2">
             {/* Text */}
             <div>
-              <h2 className="text-3xl font-bold text-amber-600">
+              <h2 className="text-4xl font-bold text-amber-600">
                 Why Purchase Solar Panels?
               </h2>
               <p className="mt-4 text-solar-700 leading-relaxed">
@@ -51,13 +51,13 @@ export default function SolarSavingsPage() {
             <div className="grid gap-4 sm:grid-cols-1">
               <div className="rounded-xl bg-white p-6 shadow-sm border border-gray-200 text-center">
                 <p className="text-4xl font-extrabold text-green-500">50%</p>
-                <p className="mt-2 text-sm font-medium text-solar-700">
+                <p className="mt-2 text-base font-medium text-solar-700">
                   Cost Decrease Over Last Decade
                 </p>
               </div>
               <div className="rounded-xl bg-white p-6 shadow-sm border border-gray-200 text-center">
                 <p className="text-4xl font-extrabold text-red-500">16%</p>
-                <p className="mt-2 text-sm font-medium text-solar-700">
+                <p className="mt-2 text-base font-medium text-solar-700">
                   Utility Price Increase
                 </p>
               </div>
@@ -65,7 +65,7 @@ export default function SolarSavingsPage() {
                 <p className="text-4xl font-extrabold text-solar-500">
                   50-90%
                 </p>
-                <p className="mt-2 text-sm font-medium text-solar-700">
+                <p className="mt-2 text-base font-medium text-solar-700">
                   Electric Bill Reduction
                 </p>
               </div>
@@ -78,7 +78,7 @@ export default function SolarSavingsPage() {
       <section className="bg-white border-t border-gray-100 py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-amber-600">
+            <h2 className="text-4xl font-bold text-amber-600">
               Maryland Solar Incentives
             </h2>
             <p className="mt-2 text-solar-700">
@@ -90,11 +90,11 @@ export default function SolarSavingsPage() {
             {/* 30% Federal Tax Credit */}
             <div className="rounded-xl bg-white p-6 shadow-sm border border-gray-200">
               <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-green-100 text-green-600">
+                <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-green-100 text-green-600">
                   <svg
-                    width={24}
-                    height={24}
-                    className="h-6 w-6"
+                    width={28}
+                    height={28}
+                    className="h-7 w-7"
                     fill="none"
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
@@ -108,13 +108,13 @@ export default function SolarSavingsPage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-amber-600">
+                  <h3 className="text-xl font-semibold text-amber-600">
                     30% Federal Tax Credit (ITC)
                   </h3>
                   <p className="mt-3 text-4xl font-extrabold text-green-500">
                     30%
                   </p>
-                  <p className="mt-3 text-sm text-solar-700 leading-relaxed">
+                  <p className="mt-3 text-base text-solar-700 leading-relaxed">
                     Deduct 30% of the cost of your solar system from your federal
                     income taxes. Available through 2032.
                   </p>
@@ -125,11 +125,11 @@ export default function SolarSavingsPage() {
             {/* 6% State Sales Tax Exemption */}
             <div className="rounded-xl bg-white p-6 shadow-sm border border-gray-200">
               <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-solar-100 text-solar-600">
+                <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-solar-100 text-solar-600">
                   <svg
-                    width={24}
-                    height={24}
-                    className="h-6 w-6"
+                    width={28}
+                    height={28}
+                    className="h-7 w-7"
                     fill="none"
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
@@ -143,10 +143,10 @@ export default function SolarSavingsPage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-amber-600">
+                  <h3 className="text-xl font-semibold text-amber-600">
                     6% State Sales Tax Exemption
                   </h3>
-                  <p className="mt-3 text-sm text-solar-700 leading-relaxed">
+                  <p className="mt-3 text-base text-solar-700 leading-relaxed">
                     Maryland exempts solar installations from the state&apos;s 6%
                     sales tax. On a $15,000 system, that&apos;s $900 in savings.
                   </p>
@@ -157,11 +157,11 @@ export default function SolarSavingsPage() {
             {/* County Property Tax Credits */}
             <div className="rounded-xl bg-white p-6 shadow-sm border border-gray-200">
               <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-purple-100 text-purple-600">
+                <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-purple-100 text-purple-600">
                   <svg
-                    width={24}
-                    height={24}
-                    className="h-6 w-6"
+                    width={28}
+                    height={28}
+                    className="h-7 w-7"
                     fill="none"
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
@@ -175,17 +175,17 @@ export default function SolarSavingsPage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-amber-600">
+                  <h3 className="text-xl font-semibold text-amber-600">
                     County Property Tax Credits
                   </h3>
                   <ul className="mt-3 space-y-2">
-                    <li className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-2.5 text-sm">
+                    <li className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-2.5 text-base">
                       <span className="text-solar-700">Baltimore County</span>
                       <span className="font-semibold text-amber-600">
                         up to $5,000
                       </span>
                     </li>
-                    <li className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-2.5 text-sm">
+                    <li className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-2.5 text-base">
                       <span className="text-solar-700">
                         Prince George&apos;s County
                       </span>
@@ -193,7 +193,7 @@ export default function SolarSavingsPage() {
                         up to $5,000
                       </span>
                     </li>
-                    <li className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-2.5 text-sm">
+                    <li className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-2.5 text-base">
                       <span className="text-solar-700">
                         Anne Arundel County
                       </span>
@@ -201,7 +201,7 @@ export default function SolarSavingsPage() {
                         up to $2,500
                       </span>
                     </li>
-                    <li className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-2.5 text-sm">
+                    <li className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-2.5 text-base">
                       <span className="text-solar-700">Harford County</span>
                       <span className="font-semibold text-amber-600">
                         up to $2,500
@@ -215,11 +215,11 @@ export default function SolarSavingsPage() {
             {/* Net Metering */}
             <div className="rounded-xl bg-white p-6 shadow-sm border border-gray-200">
               <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-sunburst-100 text-sunburst-600">
+                <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-sunburst-100 text-sunburst-600">
                   <svg
-                    width={24}
-                    height={24}
-                    className="h-6 w-6"
+                    width={28}
+                    height={28}
+                    className="h-7 w-7"
                     fill="none"
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
@@ -233,10 +233,10 @@ export default function SolarSavingsPage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-amber-600">
+                  <h3 className="text-xl font-semibold text-amber-600">
                     Net Metering
                   </h3>
-                  <p className="mt-3 text-sm text-solar-700 leading-relaxed">
+                  <p className="mt-3 text-base text-solar-700 leading-relaxed">
                     Excess solar energy gets credited back to you by your utility
                     company. Your meter runs backward when you produce more than
                     you use.
@@ -251,7 +251,7 @@ export default function SolarSavingsPage() {
       {/* ── Section 3: How Solar Saves You Money ──────────────── */}
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <h2 className="text-center text-3xl font-bold text-amber-600">
+          <h2 className="text-center text-4xl font-bold text-amber-600">
             How Solar Saves You Money
           </h2>
           <div className="mt-10 grid gap-8 sm:grid-cols-3">
@@ -274,10 +274,10 @@ export default function SolarSavingsPage() {
                   />
                 </svg>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-amber-600">
+              <h3 className="mt-4 text-xl font-semibold text-amber-600">
                 Reduce Your Electric Bill
               </h3>
-              <p className="mt-2 text-sm text-solar-700 leading-relaxed">
+              <p className="mt-2 text-base text-solar-700 leading-relaxed">
                 With solar, you lock in a fixed monthly payment that replaces
                 your fluctuating utility bill. While utility rates continue to
                 rise year after year, your solar payment stays the same for the
@@ -304,10 +304,10 @@ export default function SolarSavingsPage() {
                   />
                 </svg>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-amber-600">
+              <h3 className="mt-4 text-xl font-semibold text-amber-600">
                 Earn Net Metering Credits
               </h3>
-              <p className="mt-2 text-sm text-solar-700 leading-relaxed">
+              <p className="mt-2 text-base text-solar-700 leading-relaxed">
                 When your solar panels produce more electricity than you use, the
                 excess energy is sent to the grid and credited to your account by
                 your utility company. Those credits offset the electricity you
@@ -334,10 +334,10 @@ export default function SolarSavingsPage() {
                   />
                 </svg>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-amber-600">
+              <h3 className="mt-4 text-xl font-semibold text-amber-600">
                 Increase Your Home Value
               </h3>
-              <p className="mt-2 text-sm text-solar-700 leading-relaxed">
+              <p className="mt-2 text-base text-solar-700 leading-relaxed">
                 Studies show that solar panels add an average of $15,000 to a
                 home&apos;s resale value. Buyers are willing to pay more for a
                 home with lower energy costs and a clean energy system already in
@@ -368,10 +368,10 @@ export default function SolarSavingsPage() {
               />
             </svg>
           </div>
-          <h2 className="mt-6 text-3xl font-bold text-white sm:text-4xl">
+          <h2 className="mt-6 text-4xl font-bold text-white sm:text-5xl">
             Already Overpaying Your Electric Bill?
           </h2>
-          <p className="mt-4 text-lg text-gray-300 leading-relaxed">
+          <p className="mt-4 text-xl text-gray-300 leading-relaxed">
             We review your last 36 months of electricity bills to find
             overcharges and billing errors. Many Maryland homeowners have
             overpaid their utility company without knowing it — we help you
@@ -380,7 +380,7 @@ export default function SolarSavingsPage() {
           <div className="mt-8">
             <Link
               href="/solar/get-quote"
-              className="inline-flex items-center gap-2 rounded-full bg-solar-500 px-8 py-3 text-base font-bold text-white shadow-lg hover:bg-solar-600 transition-colors"
+              className="inline-flex items-center gap-2 rounded-full bg-solar-500 px-8 py-3 text-lg font-bold text-white shadow-lg hover:bg-solar-600 transition-colors"
             >
               Get Your Free Bill Audit
               <svg

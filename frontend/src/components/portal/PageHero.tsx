@@ -15,17 +15,17 @@ export default function PageHero({
         <div className="absolute -top-40 -right-40 h-[400px] w-[400px] rounded-full bg-solar-400 blur-3xl" />
         <div className="absolute -bottom-20 -left-20 h-[250px] w-[250px] rounded-full bg-fuchsia-400 blur-3xl" />
       </div>
-      <div className="relative mx-auto max-w-5xl px-4 py-14 text-center sm:px-6 sm:py-20">
+      <div className="relative mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-24">
         {subtitle && (
-          <p className="text-sm font-medium uppercase tracking-wider text-solar-200">
+          <p className="text-lg font-medium uppercase tracking-wider text-solar-200 sm:text-xl">
             {subtitle}
           </p>
         )}
-        <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
+        <h1 className="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-7xl">
           {title}
         </h1>
         {description && (
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-solar-100">
+          <p className="mx-auto mt-5 max-w-3xl text-xl text-solar-100 sm:text-2xl leading-relaxed">
             {description}
           </p>
         )}
