@@ -33,17 +33,17 @@ export default function PortalLayout({
       {/* Footer */}
       <footer className="border-t border-gray-200 bg-solar-900 text-gray-300">
         <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
-          <div className="mb-8 flex justify-start">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/solar-command-logo.png"
-              alt="Solar Command"
-              width={160}
-              height={200}
-              className="h-32 w-auto object-contain sm:h-40"
-            />
-          </div>
-          <div className="grid gap-8 sm:grid-cols-3">
+          <div className="grid gap-8 sm:grid-cols-[auto_1fr_1fr_1fr]">
+            <div className="flex items-start">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/solar-command-logo.png"
+                alt="Solar Command"
+                width={120}
+                height={150}
+                className="h-28 w-auto object-contain sm:h-36"
+              />
+            </div>
             <div>
               <h4 className="text-lg font-semibold text-white mb-3">
                 Solar Command
