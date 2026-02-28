@@ -1,9 +1,11 @@
 """Celery background tasks for outreach processing."""
 
+import logging
 import random
 from datetime import datetime, timezone
 
-from sqlalchemy import create_engine, select
+import redis
+from sqlalchemy import create_engine, select, update
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
@@ -17,49 +19,78 @@ from app.models.schema import (
 )
 from app.workers.celery_app import celery_app
 
+logger = logging.getLogger(__name__)
 settings = get_settings()
 
 # Celery tasks use synchronous DB (Celery doesn't support async natively)
 sync_engine = create_engine(settings.database_url_sync, echo=False)
 
+# Redis client for distributed locking
+_redis = redis.from_url(settings.redis_url)
 
-@celery_app.task(name="app.workers.tasks.process_outreach_queue")
-def process_outreach_queue():
+
+@celery_app.task(
+    name="app.workers.tasks.process_outreach_queue",
+    bind=True,
+    max_retries=3,
+    default_retry_delay=30,
+)
+def process_outreach_queue(self):
     """Poll for pending outreach attempts and simulate execution.
 
-    In production, this would:
-    - For voice: initiate a Twilio call with the AI agent
-    - For SMS: send via Twilio SMS API
-    - For email: send via SendGrid
+    Uses a Redis distributed lock to prevent concurrent processing.
     """
-    with Session(sync_engine) as db:
-        # Find pending attempts (no disposition yet)
-        result = db.execute(
-            select(OutreachAttempt)
-            .where(OutreachAttempt.disposition.is_(None))
-            .limit(10)
-        )
-        attempts = result.scalars().all()
+    lock = _redis.lock("lock:process_outreach_queue", timeout=120)
+    if not lock.acquire(blocking=False):
+        logger.info("Outreach queue already being processed — skipping")
+        return
 
-        for attempt in attempts:
-            _simulate_outreach(db, attempt)
+    try:
+        with Session(sync_engine) as db:
+            # Find pending attempts (no disposition yet)
+            result = db.execute(
+                select(OutreachAttempt)
+                .where(OutreachAttempt.disposition.is_(None))
+                .limit(10)
+            )
+            attempts = result.scalars().all()
 
-        db.commit()
+            for attempt in attempts:
+                _simulate_outreach(db, attempt)
+
+            db.commit()
+    except Exception as exc:
+        logger.error("Outreach queue error: %s", exc)
+        raise self.retry(exc=exc)
+    finally:
+        try:
+            lock.release()
+        except redis.exceptions.LockNotOwnedError:
+            pass
 
 
-@celery_app.task(name="app.workers.tasks.execute_outreach")
-def execute_outreach(attempt_id: int):
+@celery_app.task(
+    name="app.workers.tasks.execute_outreach",
+    bind=True,
+    max_retries=3,
+    default_retry_delay=30,
+)
+def execute_outreach(self, attempt_id: int):
     """Execute a single outreach attempt."""
-    with Session(sync_engine) as db:
-        attempt = db.get(OutreachAttempt, attempt_id)
-        if not attempt:
-            return
+    try:
+        with Session(sync_engine) as db:
+            attempt = db.get(OutreachAttempt, attempt_id)
+            if not attempt:
+                return
 
-        if attempt.disposition is not None:
-            return  # Already processed
+            if attempt.disposition is not None:
+                return  # Already processed
 
-        _simulate_outreach(db, attempt)
-        db.commit()
+            _simulate_outreach(db, attempt)
+            db.commit()
+    except Exception as exc:
+        logger.error("Execute outreach error for attempt %d: %s", attempt_id, exc)
+        raise self.retry(exc=exc)
 
 
 def _simulate_outreach(db: Session, attempt: OutreachAttempt):
@@ -99,8 +130,15 @@ def _simulate_outreach(db: Session, attempt: OutreachAttempt):
         attempt.duration_seconds = random.randint(5, 180) if chosen != ContactDisposition.no_answer else 0
         attempt.transcript = f"[SIMULATED] Disposition: {chosen.value}"
 
-        lead.total_call_attempts += 1
-        lead.last_contacted_at = now
+        # Atomic counter increment
+        db.execute(
+            update(Lead)
+            .where(Lead.id == lead.id)
+            .values(
+                total_call_attempts=Lead.total_call_attempts + 1,
+                last_contacted_at=now,
+            )
+        )
 
         # Update lead status based on disposition — but never downgrade
         # from appointment_set, qualified, or closed_won
@@ -124,14 +162,26 @@ def _simulate_outreach(db: Session, attempt: OutreachAttempt):
         attempt.disposition = ContactDisposition.completed
         attempt.ended_at = now
         attempt.message_body = "[SIMULATED] SMS sent"
-        lead.total_sms_sent += 1
-        lead.last_contacted_at = now
+        # Atomic counter increment
+        db.execute(
+            update(Lead)
+            .where(Lead.id == lead.id)
+            .values(
+                total_sms_sent=Lead.total_sms_sent + 1,
+                last_contacted_at=now,
+            )
+        )
 
     elif attempt.channel == ContactChannel.email:
         attempt.disposition = ContactDisposition.completed
         attempt.ended_at = now
         attempt.message_body = "[SIMULATED] Email sent"
-        lead.total_emails_sent += 1
+        # Atomic counter increment
+        db.execute(
+            update(Lead)
+            .where(Lead.id == lead.id)
+            .values(total_emails_sent=Lead.total_emails_sent + 1)
+        )
 
     # Audit log
     db.add(

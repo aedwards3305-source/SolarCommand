@@ -48,3 +48,14 @@ export function formatCurrency(val: number | null | undefined): string {
     maximumFractionDigits: 0,
   }).format(val);
 }
+
+export function formatCostUsd(val: number | null | undefined): string {
+  if (val == null) return "—";
+  if (val < 0.01) return "$" + val.toFixed(4);
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(val);
+}

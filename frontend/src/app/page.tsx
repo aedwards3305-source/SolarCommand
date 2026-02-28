@@ -6,16 +6,16 @@ import { useAuth } from "@/lib/auth";
 
 export default function Home() {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, loading, hasToken } = useAuth();
 
   useEffect(() => {
     if (loading) return;
-    if (user) {
+    if (user || hasToken) {
       router.replace("/dashboard");
     } else {
       router.replace("/login");
     }
-  }, [user, loading, router]);
+  }, [user, loading, hasToken, router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">

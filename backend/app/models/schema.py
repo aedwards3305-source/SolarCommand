@@ -138,6 +138,10 @@ class Property(Base):
     owner_phone: Mapped[str | None] = mapped_column(String(20))
     owner_email: Mapped[str | None] = mapped_column(String(255))
 
+    # Geolocation
+    latitude: Mapped[float | None] = mapped_column(Float)
+    longitude: Mapped[float | None] = mapped_column(Float)
+
     # Census / demographics
     median_household_income: Mapped[float | None] = mapped_column(Float)
 
@@ -172,6 +176,9 @@ class Lead(Base):
         Enum(LeadStatus), default=LeadStatus.ingested, nullable=False
     )
     assigned_rep_id: Mapped[int | None] = mapped_column(ForeignKey("rep_user.id"))
+
+    # Portal access token (unique URL slug for customer-facing portal)
+    portal_token: Mapped[str | None] = mapped_column(String(20), unique=True, index=True)
 
     # Contact info (copied from property for quick access)
     first_name: Mapped[str | None] = mapped_column(String(100))
@@ -460,3 +467,433 @@ class Note(Base):
     lead: Mapped["Lead"] = relationship(back_populates="notes")
 
     __table_args__ = (Index("ix_note_lead_id", "lead_id"),)
+
+
+# ── AI Module Enums ───────────────────────────────────────────────────────
+
+
+class MessageDirection(str, enum.Enum):
+    inbound = "inbound"
+    outbound = "outbound"
+
+
+class QAFlagSeverity(str, enum.Enum):
+    info = "info"
+    warning = "warning"
+    critical = "critical"
+
+
+class NBAAction(str, enum.Enum):
+    call = "call"
+    sms = "sms"
+    email = "email"
+    wait = "wait"
+    rep_handoff = "rep_handoff"
+    nurture = "nurture"
+    close = "close"
+
+
+class VoiceProviderEnum(str, enum.Enum):
+    twilio = "twilio"
+    vapi = "vapi"
+    retell = "retell"
+
+
+# ── AI Module Models ──────────────────────────────────────────────────────
+
+
+class ContactIntelligence(Base):
+    """Phone/email validation results and best contact time."""
+    __tablename__ = "contact_intelligence"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    lead_id: Mapped[int] = mapped_column(ForeignKey("lead.id"), nullable=False)
+
+    # Phone validation
+    phone_valid: Mapped[bool | None] = mapped_column(Boolean)
+    phone_type: Mapped[str | None] = mapped_column(String(20))  # mobile, landline, voip
+    carrier_name: Mapped[str | None] = mapped_column(String(100))
+
+    # Email validation
+    email_valid: Mapped[bool | None] = mapped_column(Boolean)
+    email_deliverable: Mapped[bool | None] = mapped_column(Boolean)
+
+    # Best contact time (learned from response patterns)
+    best_call_hour: Mapped[int | None] = mapped_column(Integer)  # 0-23 ET
+    best_sms_hour: Mapped[int | None] = mapped_column(Integer)
+    timezone: Mapped[str] = mapped_column(String(50), default="America/New_York")
+
+    # Provider raw response
+    provider_payload: Mapped[dict | None] = mapped_column(JSONB)
+
+    validated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+    lead: Mapped["Lead"] = relationship()
+
+    __table_args__ = (
+        Index("ix_ci_lead_id", "lead_id"),
+    )
+
+
+class InboundMessage(Base):
+    """SMS inbound/outbound message tracking with threading."""
+    __tablename__ = "inbound_message"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    lead_id: Mapped[int] = mapped_column(ForeignKey("lead.id"), nullable=False)
+
+    direction: Mapped[MessageDirection] = mapped_column(
+        Enum(MessageDirection), nullable=False
+    )
+    channel: Mapped[ContactChannel] = mapped_column(
+        Enum(ContactChannel), nullable=False, default=ContactChannel.sms
+    )
+    from_number: Mapped[str | None] = mapped_column(String(20))
+    to_number: Mapped[str | None] = mapped_column(String(20))
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+
+    # AI classification
+    ai_intent: Mapped[str | None] = mapped_column(String(50))  # opt_out, interested, question, etc.
+    ai_suggested_reply: Mapped[str | None] = mapped_column(Text)
+    ai_actions: Mapped[dict | None] = mapped_column(JSONB)  # [{"action": "...", "params": {...}}]
+    ai_model: Mapped[str | None] = mapped_column(String(50))
+
+    # Twilio / provider fields
+    external_id: Mapped[str | None] = mapped_column(String(100))
+    provider_payload: Mapped[dict | None] = mapped_column(JSONB)
+
+    # Tracking
+    sent_by: Mapped[str | None] = mapped_column(String(100))  # "ai_agent", "rep:email", "system"
+    script_version_id: Mapped[int | None] = mapped_column(ForeignKey("script_version.id"))
+    outreach_attempt_id: Mapped[int | None] = mapped_column(ForeignKey("outreach_attempt.id"))
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    lead: Mapped["Lead"] = relationship()
+
+    __table_args__ = (
+        Index("ix_msg_lead_id", "lead_id"),
+        Index("ix_msg_created_at", "created_at"),
+        Index("ix_msg_direction", "direction"),
+        Index("ix_msg_from_number", "from_number"),
+    )
+
+
+class ConversationTranscript(Base):
+    """Call/SMS transcript storage with AI-generated summary."""
+    __tablename__ = "conversation_transcript"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    lead_id: Mapped[int] = mapped_column(ForeignKey("lead.id"), nullable=False)
+    channel: Mapped[ContactChannel] = mapped_column(Enum(ContactChannel), nullable=False)
+    outreach_attempt_id: Mapped[int | None] = mapped_column(ForeignKey("outreach_attempt.id"))
+
+    raw_transcript: Mapped[str] = mapped_column(Text, nullable=False)
+    ai_summary: Mapped[str | None] = mapped_column(Text)
+    ai_sentiment: Mapped[str | None] = mapped_column(String(20))  # positive, neutral, negative
+    ai_output: Mapped[dict | None] = mapped_column(JSONB)
+    ai_model: Mapped[str | None] = mapped_column(String(50))
+
+    duration_seconds: Mapped[int | None] = mapped_column(Integer)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    # Voice provider fields
+    provider: Mapped[str | None] = mapped_column(String(20))  # twilio, vapi, retell
+    call_sid: Mapped[str | None] = mapped_column(String(100))
+    recording_url: Mapped[str | None] = mapped_column(String(500))
+    call_status: Mapped[str | None] = mapped_column(String(30))  # queued, ringing, in-progress, completed, failed
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    lead: Mapped["Lead"] = relationship()
+
+    __table_args__ = (
+        Index("ix_transcript_lead_id", "lead_id"),
+        Index("ix_transcript_created_at", "created_at"),
+        Index("ix_transcript_call_sid", "call_sid"),
+    )
+
+
+class QAReview(Base):
+    """Compliance QA review for conversations."""
+    __tablename__ = "qa_review"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    lead_id: Mapped[int] = mapped_column(ForeignKey("lead.id"), nullable=False)
+    conversation_id: Mapped[int | None] = mapped_column(
+        ForeignKey("conversation_transcript.id")
+    )
+
+    compliance_score: Mapped[int] = mapped_column(Integer, nullable=False)  # 0-100
+    flags: Mapped[dict | None] = mapped_column(JSONB)  # [{"flag": "...", "severity": "..."}]
+    checklist_pass: Mapped[bool] = mapped_column(Boolean, default=True)
+    rationale: Mapped[str | None] = mapped_column(Text)
+
+    reviewed_by: Mapped[str] = mapped_column(String(100), default="ai_agent")
+    ai_output: Mapped[dict | None] = mapped_column(JSONB)
+    ai_model: Mapped[str | None] = mapped_column(String(50))
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    lead: Mapped["Lead"] = relationship()
+    conversation: Mapped["ConversationTranscript | None"] = relationship()
+
+    __table_args__ = (
+        Index("ix_qa_lead_id", "lead_id"),
+        Index("ix_qa_compliance_score", "compliance_score"),
+        Index("ix_qa_created_at", "created_at"),
+    )
+
+
+class ObjectionTag(Base):
+    """Objections extracted from conversations."""
+    __tablename__ = "objection_tag"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    conversation_id: Mapped[int] = mapped_column(
+        ForeignKey("conversation_transcript.id"), nullable=False
+    )
+    lead_id: Mapped[int] = mapped_column(ForeignKey("lead.id"), nullable=False)
+
+    tag: Mapped[str] = mapped_column(String(100), nullable=False)  # "too_expensive", "roof_condition"
+    confidence: Mapped[float] = mapped_column(Float, default=0.0)
+    evidence_span: Mapped[str | None] = mapped_column(Text)  # quoted text from transcript
+    ai_output: Mapped[dict | None] = mapped_column(JSONB)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    conversation: Mapped["ConversationTranscript"] = relationship()
+
+    __table_args__ = (
+        Index("ix_objection_conversation_id", "conversation_id"),
+        Index("ix_objection_tag", "tag"),
+        Index("ix_objection_lead_id", "lead_id"),
+    )
+
+
+class NBADecision(Base):
+    """Next-Best-Action recommendation for a lead."""
+    __tablename__ = "nba_decision"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    lead_id: Mapped[int] = mapped_column(ForeignKey("lead.id"), nullable=False)
+
+    recommended_action: Mapped[NBAAction] = mapped_column(
+        Enum(NBAAction), nullable=False
+    )
+    recommended_channel: Mapped[ContactChannel | None] = mapped_column(
+        Enum(ContactChannel)
+    )
+    schedule_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    reason_codes: Mapped[dict | None] = mapped_column(JSONB)  # ["high_score", "best_call_time"]
+    confidence: Mapped[float] = mapped_column(Float, default=0.0)
+
+    ai_output: Mapped[dict | None] = mapped_column(JSONB)
+    ai_model: Mapped[str | None] = mapped_column(String(50))
+
+    # TTL: this decision is valid until...
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    applied: Mapped[bool] = mapped_column(Boolean, default=False)
+    applied_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    lead: Mapped["Lead"] = relationship()
+
+    __table_args__ = (
+        Index("ix_nba_lead_id", "lead_id"),
+        Index("ix_nba_created_at", "created_at"),
+        Index("ix_nba_expires_at", "expires_at"),
+    )
+
+
+class ScriptExperiment(Base):
+    """A/B experiment tracking for script versions."""
+    __tablename__ = "script_experiment"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    channel: Mapped[ContactChannel] = mapped_column(Enum(ContactChannel), nullable=False)
+    control_script_id: Mapped[int] = mapped_column(
+        ForeignKey("script_version.id"), nullable=False
+    )
+    variant_script_id: Mapped[int] = mapped_column(
+        ForeignKey("script_version.id"), nullable=False
+    )
+
+    # Metrics
+    control_sends: Mapped[int] = mapped_column(Integer, default=0)
+    variant_sends: Mapped[int] = mapped_column(Integer, default=0)
+    control_responses: Mapped[int] = mapped_column(Integer, default=0)
+    variant_responses: Mapped[int] = mapped_column(Integer, default=0)
+    control_conversions: Mapped[int] = mapped_column(Integer, default=0)
+    variant_conversions: Mapped[int] = mapped_column(Integer, default=0)
+
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    started_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    control_script: Mapped["ScriptVersion"] = relationship(foreign_keys=[control_script_id])
+    variant_script: Mapped["ScriptVersion"] = relationship(foreign_keys=[variant_script_id])
+
+    __table_args__ = (
+        Index("ix_experiment_active", "is_active"),
+        Index("ix_experiment_channel", "channel"),
+    )
+
+
+# ── AI Operator Models ──────────────────────────────────────────────────
+
+
+class AIRun(Base):
+    """Audit trail for every AI API call — reproducibility + cost tracking."""
+    __tablename__ = "ai_run"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    task_type: Mapped[str] = mapped_column(String(50), nullable=False)  # nba, qa, objection_tags, rep_brief, etc.
+    lead_id: Mapped[int | None] = mapped_column(ForeignKey("lead.id"))
+    conversation_id: Mapped[int | None] = mapped_column(ForeignKey("conversation_transcript.id"))
+
+    # Model config (for reproducibility)
+    model: Mapped[str] = mapped_column(String(100), nullable=False)
+    temperature: Mapped[float] = mapped_column(Float, default=0.2)
+    prompt_version: Mapped[str] = mapped_column(String(20), default="v1")
+
+    # Input/output (full audit)
+    input_json: Mapped[dict | None] = mapped_column(JSONB)
+    output_json: Mapped[dict | None] = mapped_column(JSONB)
+
+    # Cost + performance
+    tokens_in: Mapped[int | None] = mapped_column(Integer)
+    tokens_out: Mapped[int | None] = mapped_column(Integer)
+    cost_usd: Mapped[float | None] = mapped_column(Float)
+    latency_ms: Mapped[int | None] = mapped_column(Integer)
+
+    # Status
+    status: Mapped[str] = mapped_column(String(20), default="pending")  # pending, success, error
+    error: Mapped[str | None] = mapped_column(Text)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    __table_args__ = (
+        Index("ix_ai_run_task_type", "task_type"),
+        Index("ix_ai_run_lead_id", "lead_id"),
+        Index("ix_ai_run_created_at", "created_at"),
+        Index("ix_ai_run_status", "status"),
+    )
+
+
+class AIMemory(Base):
+    """Durable learning store — lessons, patterns, summaries for RAG retrieval."""
+    __tablename__ = "ai_memory"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    scope: Mapped[str] = mapped_column(String(50), nullable=False)  # global, county, utility, script, rep
+    key: Mapped[str] = mapped_column(String(200), nullable=False)  # e.g. "top_objections", "best_call_hours"
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    meta_json: Mapped[dict | None] = mapped_column(JSONB)  # Additional structured data
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    __table_args__ = (
+        Index("ix_ai_memory_scope_key", "scope", "key", unique=True),
+        Index("ix_ai_memory_scope", "scope"),
+    )
+
+
+# ── Enrichment Models ─────────────────────────────────────────────────
+
+
+class ContactEnrichment(Base):
+    """Third-party enrichment data (People Data Labs, etc.)."""
+    __tablename__ = "contact_enrichment"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    lead_id: Mapped[int] = mapped_column(ForeignKey("lead.id"), nullable=False)
+    provider: Mapped[str] = mapped_column(String(50), nullable=False)  # pdl, clearbit, etc.
+
+    full_name: Mapped[str | None] = mapped_column(String(200))
+    emails: Mapped[dict | None] = mapped_column(JSONB)  # [{"email": "...", "type": "..."}]
+    phones: Mapped[dict | None] = mapped_column(JSONB)  # [{"number": "...", "type": "..."}]
+    job_title: Mapped[str | None] = mapped_column(String(200))
+    linkedin_url: Mapped[str | None] = mapped_column(String(500))
+    confidence: Mapped[float] = mapped_column(Float, default=0.0)
+    raw_response: Mapped[dict | None] = mapped_column(JSONB)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+    lead: Mapped["Lead"] = relationship()
+
+    __table_args__ = (
+        Index("ix_enrichment_lead_id", "lead_id"),
+    )
+
+
+class ContactValidation(Base):
+    """Contact validation results (Melissa, etc.)."""
+    __tablename__ = "contact_validation"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    lead_id: Mapped[int] = mapped_column(ForeignKey("lead.id"), nullable=False)
+    provider: Mapped[str] = mapped_column(String(50), nullable=False)  # melissa, twilio_lookup
+
+    # Phone validation
+    phone_valid: Mapped[bool | None] = mapped_column(Boolean)
+    phone_type: Mapped[str | None] = mapped_column(String(20))
+    phone_carrier: Mapped[str | None] = mapped_column(String(100))
+    phone_line_status: Mapped[str | None] = mapped_column(String(30))
+
+    # Email validation
+    email_valid: Mapped[bool | None] = mapped_column(Boolean)
+    email_deliverable: Mapped[bool | None] = mapped_column(Boolean)
+    email_disposable: Mapped[bool | None] = mapped_column(Boolean)
+
+    # Address validation
+    address_valid: Mapped[bool | None] = mapped_column(Boolean)
+    address_deliverable: Mapped[bool | None] = mapped_column(Boolean)
+
+    confidence: Mapped[float] = mapped_column(Float, default=0.0)
+    raw_response: Mapped[dict | None] = mapped_column(JSONB)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+    lead: Mapped["Lead"] = relationship()
+
+    __table_args__ = (
+        Index("ix_validation_lead_id", "lead_id"),
+    )

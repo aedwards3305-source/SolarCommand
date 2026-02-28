@@ -1,6 +1,7 @@
 services:
   db:
     image: postgres:16-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_USER: solar
       POSTGRES_PASSWORD: solar
@@ -15,9 +16,14 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 512M
 
   redis:
     image: redis:7-alpine
+    restart: unless-stopped
     ports:
       - "6379:6379"
     healthcheck:
@@ -25,46 +31,98 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
   api:
     build:
       context: ./backend
+    restart: unless-stopped
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql+asyncpg://solar:solar@db:5432/solarcommand
-      DATABASE_URL_SYNC: postgresql://solar:solar@db:5432/solarcommand
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://solar:solar@db:5432/solarcommand}
+      DATABASE_URL_SYNC: ${DATABASE_URL_SYNC:-postgresql://solar:solar@db:5432/solarcommand}
       REDIS_URL: redis://redis:6379/0
-      JWT_SECRET: dev-secret-change-in-production
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
+      DEBUG: "true"
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      VOICE_PROVIDER: ${VOICE_PROVIDER:-twilio}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_PHONE_NUMBER: ${TWILIO_PHONE_NUMBER:-}
+      TWILIO_WEBHOOK_SECRET: ${TWILIO_WEBHOOK_SECRET:-}
+      WEBHOOK_API_KEY: ${WEBHOOK_API_KEY:-}
+      VAPI_API_KEY: ${VAPI_API_KEY:-}
+      VAPI_PHONE_NUMBER_ID: ${VAPI_PHONE_NUMBER_ID:-}
+      VAPI_MODEL: ${VAPI_MODEL:-claude-sonnet-4-5-20250929}
+      PDL_API_KEY: ${PDL_API_KEY:-}
+      MELISSA_API_KEY: ${MELISSA_API_KEY:-}
+      TRACERFY_API_KEY: ${TRACERFY_API_KEY:-}
+      ENRICHMENT_CONFIDENCE_MIN: ${ENRICHMENT_CONFIDENCE_MIN:-0.5}
     depends_on:
-      db:
-        condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c 'import httpx; r=httpx.get(\"http://localhost:8000/health\"); r.raise_for_status()' || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     command: >
-      sh -c "alembic upgrade head && PGPASSWORD=solar psql -h db -U solar -d solarcommand -f /seed/seed.sql 2>/dev/null; uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+      sh -c "alembic upgrade head 2>/dev/null; uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
     volumes:
       - ./backend:/app
       - ./infrastructure/seed.sql:/seed/seed.sql
+    deploy:
+      resources:
+        limits:
+          memory: 1G
 
   worker:
     build:
       context: ./backend
+    restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql+asyncpg://solar:solar@db:5432/solarcommand
-      DATABASE_URL_SYNC: postgresql://solar:solar@db:5432/solarcommand
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://solar:solar@db:5432/solarcommand}
+      DATABASE_URL_SYNC: ${DATABASE_URL_SYNC:-postgresql://solar:solar@db:5432/solarcommand}
       REDIS_URL: redis://redis:6379/0
+      DEBUG: "true"
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      VOICE_PROVIDER: ${VOICE_PROVIDER:-twilio}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_PHONE_NUMBER: ${TWILIO_PHONE_NUMBER:-}
+      VAPI_API_KEY: ${VAPI_API_KEY:-}
+      VAPI_PHONE_NUMBER_ID: ${VAPI_PHONE_NUMBER_ID:-}
+      VAPI_MODEL: ${VAPI_MODEL:-claude-sonnet-4-5-20250929}
+      PDL_API_KEY: ${PDL_API_KEY:-}
+      MELISSA_API_KEY: ${MELISSA_API_KEY:-}
+      TRACERFY_API_KEY: ${TRACERFY_API_KEY:-}
+      ENRICHMENT_CONFIDENCE_MIN: ${ENRICHMENT_CONFIDENCE_MIN:-0.5}
     depends_on:
-      db:
-        condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A app.workers.celery_app inspect ping --timeout 10 || exit 1"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+      start_period: 30s
     command: celery -A app.workers.celery_app worker --loglevel=info --beat
     volumes:
       - ./backend:/app
+    deploy:
+      resources:
+        limits:
+          memory: 1G
 
   frontend:
     image: node:20-alpine
+    restart: unless-stopped
     working_dir: /app
     ports:
       - "3000:3000"
@@ -75,10 +133,20 @@ services:
       INTERNAL_API_URL: http://api:8000
     depends_on:
       - api
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     command: sh -c "npm install && npm run dev"
     volumes:
       - ./frontend:/app
       - frontend_node_modules:/app/node_modules
+    deploy:
+      resources:
+        limits:
+          memory: 1G
 
 volumes:
   pgdata:

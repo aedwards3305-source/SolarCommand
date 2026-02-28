@@ -8,7 +8,8 @@ from app.core.config import get_settings
 
 settings = get_settings()
 
-engine = create_async_engine(settings.database_url, echo=settings.debug, future=True)
+async_engine = create_async_engine(settings.database_url, echo=settings.debug, future=True)
+engine = async_engine  # Alias for backward compatibility
 
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 

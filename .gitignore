@@ -35,6 +35,15 @@ celerybeat-schedule
 
 # Misc
 nul
+*.tsbuildinfo
+
+# Local / personal files
+Board License.png
+Solar Command logo.html
+Solar Command logo_files/
+Picture/
+C*claudetoken.json
+.claude/
 
 # Testing
 .coverage
