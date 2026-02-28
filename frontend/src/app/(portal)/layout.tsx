@@ -18,15 +18,7 @@ export default function PortalLayout({
       {/* Header — blue banner */}
       <header className="relative border-b border-solar-800/30 bg-solar-700 sticky top-0 z-30">
         <div className="mx-auto max-w-6xl flex items-center px-4 py-2 sm:px-6 sm:py-3">
-          <Link href="/solar" className="flex items-center gap-3 flex-shrink-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/solar-command-logo.png"
-              alt="Solar Command"
-              width={48}
-              height={48}
-              className="h-11 w-11 object-contain object-top sm:h-12 sm:w-12"
-            />
+          <Link href="/solar" className="flex items-center flex-shrink-0">
             <span className="text-xl font-bold text-white tracking-tight sm:text-2xl">
               Solar Command
             </span>
@@ -41,6 +33,16 @@ export default function PortalLayout({
       {/* Footer */}
       <footer className="border-t border-gray-200 bg-solar-900 text-gray-300">
         <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+          <div className="mb-8 flex justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/solar-command-logo.png"
+              alt="Solar Command"
+              width={160}
+              height={200}
+              className="h-32 w-auto object-contain sm:h-40"
+            />
+          </div>
           <div className="grid gap-8 sm:grid-cols-3">
             <div>
               <h4 className="text-lg font-semibold text-white mb-3">
