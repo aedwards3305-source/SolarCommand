@@ -62,22 +62,6 @@ export default function SolarHomePage() {
         </div>
       </section>
 
-      {/* ── Hero Image ─────────────────────────────────────── */}
-      <section className="bg-white py-10 sm:py-14">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          <div className="overflow-hidden rounded-2xl shadow-2xl">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/commercial-hero.png"
-              alt="Solar Command commercial solar panel installation"
-              width={908}
-              height={592}
-              className="h-auto w-full object-cover"
-            />
-          </div>
-        </div>
-      </section>
-
       {/* ── Make the Smart Investment ────────────────────────── */}
       <section className="bg-white py-16 sm:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
