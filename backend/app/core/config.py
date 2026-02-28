@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     sendgrid_api_key: str = ""
     sendgrid_from_email: str = "solar@example.com"
 
+    # Email notifications — where new lead alerts are sent
+    notification_email: str = ""
+
     # AI Provider — Anthropic Claude (primary)
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-sonnet-4-5-20250929"

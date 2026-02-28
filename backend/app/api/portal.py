@@ -12,6 +12,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from app.core.database import get_db
+from app.services.email import send_new_lead_notification
 from app.models.schema import (
     Appointment,
     AppointmentStatus,
@@ -148,6 +149,18 @@ async def submit_quote(data: QuoteRequest):
         )
         db.add(consent)
         await db.commit()
+
+        # Send email notification to business owner (non-blocking)
+        await send_new_lead_notification(
+            first_name=data.first_name,
+            last_name=data.last_name,
+            phone=data.phone,
+            email=data.email,
+            address=data.address,
+            city=data.city,
+            state=data.state,
+            zip_code=data.zip_code,
+        )
 
         return {
             "token": token,
