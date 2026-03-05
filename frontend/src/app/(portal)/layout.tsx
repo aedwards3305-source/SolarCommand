@@ -18,7 +18,7 @@ export default function PortalLayout({
       {/* Header — blue banner */}
       <header className="relative border-b border-solar-800/30 bg-solar-700 sticky top-0 z-30">
         <div className="mx-auto max-w-6xl flex items-center px-4 py-2 sm:px-6 sm:py-3">
-          <Link href="/solar" className="flex items-center flex-shrink-0">
+          <Link href="/" className="flex items-center flex-shrink-0">
             <span className="text-xl font-bold text-white tracking-tight sm:text-2xl">
               Solar Command
             </span>
@@ -76,7 +76,7 @@ export default function PortalLayout({
                 Get Started
               </h4>
               <p className="text-base leading-relaxed">
-                <Link href="/solar/get-quote" className="hover:text-white transition-colors">
+                <Link href="/get-quote" className="hover:text-white transition-colors">
                   Request a Free Quote
                 </Link>
               </p>

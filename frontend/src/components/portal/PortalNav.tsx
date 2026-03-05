@@ -5,11 +5,11 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const NAV_LINKS = [
-  { href: "/solar/why-solar-command", label: "Why Solar Command" },
-  { href: "/solar/savings", label: "Savings" },
-  { href: "/solar/why-solar", label: "Why Solar" },
-  { href: "/solar/batteries", label: "Batteries" },
-  { href: "/solar/financing", label: "Financing" },
+  { href: "/why-solar-command", label: "Why Solar Command" },
+  { href: "/savings", label: "Savings" },
+  { href: "/why-solar", label: "Why Solar" },
+  { href: "/batteries", label: "Batteries" },
+  { href: "/financing", label: "Financing" },
 ];
 
 export default function PortalNav() {
@@ -37,9 +37,9 @@ export default function PortalNav() {
           </Link>
         ))}
         <Link
-          href="/solar/get-quote"
+          href="/get-quote"
           className={`ml-auto whitespace-nowrap rounded-full px-6 py-2 text-base font-bold transition-colors ${
-            isActive("/solar/get-quote")
+            isActive("/get-quote")
               ? "bg-white text-solar-700"
               : "bg-white text-solar-700 hover:bg-solar-50"
           }`}
@@ -90,7 +90,7 @@ export default function PortalNav() {
               </Link>
             ))}
             <Link
-              href="/solar/get-quote"
+              href="/get-quote"
               onClick={() => setOpen(false)}
               className="mt-1 rounded-lg bg-white px-3 py-3 text-center text-base font-bold text-solar-700 hover:bg-solar-50 transition-colors"
             >

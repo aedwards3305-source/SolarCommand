@@ -41,13 +41,13 @@ export default function ThankYouPage() {
 
         <div className="mt-8 space-y-3">
           <a
-            href="/solar/get-quote"
+            href="/get-quote"
             className="block w-full rounded-lg bg-solar-600 px-6 py-3 text-sm font-bold text-white hover:bg-solar-700 transition-colors"
           >
             Get Another Quote
           </a>
           <a
-            href="/solar"
+            href="/"
             className="block w-full text-center text-sm text-gray-500 hover:text-solar-600 transition-colors py-1"
           >
             Back to Home

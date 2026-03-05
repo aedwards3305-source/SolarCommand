@@ -28,7 +28,7 @@ export default function GetQuotePage() {
       if (res.token) {
         router.push(`/p/${res.token}`);
       } else {
-        router.push("/solar/thank-you");
+        router.push("/thank-you");
       }
     } catch (err) {
       setError(

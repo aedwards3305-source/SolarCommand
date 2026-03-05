@@ -12,24 +12,30 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Public routes that don't need auth
-  const publicPaths = ["/login", "/api", "/_next", "/favicon.ico", "/health", "/p", "/solar"];
-  if (publicPaths.some((p) => pathname.startsWith(p))) {
+  // Protected paths that require authentication (CRM / admin)
+  const protectedPrefixes = [
+    "/dashboard",
+    "/leads",
+    "/appointments",
+    "/upload",
+    "/discovery",
+    "/activation",
+    "/admin",
+  ];
+
+  const isProtected = protectedPrefixes.some((p) => pathname.startsWith(p));
+
+  // Public routes (customer portal, login, static assets, etc.) — no auth needed
+  if (!isProtected) {
     return NextResponse.next();
   }
 
-  // Allow static assets (images, fonts, etc.) served from /public
-  if (/\.(png|jpg|jpeg|gif|svg|ico|webp|woff2?|ttf|css|js|map)$/i.test(pathname)) {
-    return NextResponse.next();
-  }
-
-  // Check for auth token in cookie or localStorage isn't available in middleware,
-  // so we check the cookie that the auth provider sets
+  // Check for auth token in cookie or authorization header
   const token =
     request.cookies.get("token")?.value ||
     request.headers.get("authorization")?.replace("Bearer ", "");
 
-  if (!token && pathname !== "/login") {
+  if (!token) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);

@@ -379,7 +379,7 @@ export default function SolarSavingsPage() {
           </p>
           <div className="mt-8">
             <Link
-              href="/solar/get-quote"
+              href="/get-quote"
               className="inline-flex items-center gap-2 rounded-full bg-solar-500 px-8 py-3 text-lg font-bold text-white shadow-lg hover:bg-solar-600 transition-colors"
             >
               Get Your Free Bill Audit

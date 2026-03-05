@@ -275,7 +275,7 @@ export default function SolarFinancingPage() {
                   {plan.description}
                 </p>
                 <Link
-                  href="/solar/get-quote"
+                  href="/get-quote"
                   className="mt-5 inline-flex items-center gap-1 text-base font-semibold text-solar-600 hover:text-solar-700 transition-colors"
                 >
                   Learn More
