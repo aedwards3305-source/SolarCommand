@@ -42,6 +42,7 @@ export default function DiscoveryPage() {
   const [showDiscoverPicker, setShowDiscoverPicker] = useState(false);
   const [pipelining, setPipelining] = useState(false);
   const [showPipelinePicker, setShowPipelinePicker] = useState(false);
+  const [showSmsPicker, setShowSmsPicker] = useState(false);
   const [error, setError] = useState("");
 
   // Filters
@@ -128,15 +129,35 @@ export default function DiscoveryPage() {
     setShowPipelinePicker(false);
     try {
       const res = await leadgenApi.runFullPipeline(selectedCounty);
-      setEnrichMsg(
-        `Pipeline done: ${res.discovered} new leads, ${res.phones_found} phones found, ${res.activated} activated`
-      );
+      const parts = [`${res.discovered} new leads`];
+      if (res.phones_found > 0) parts.push(`${res.phones_found} phones found`);
+      if (res.activated > 0) parts.push(`${res.activated} activated`);
+      if (res.sms_queued > 0) parts.push(`${res.sms_queued} texts sent`);
+      setEnrichMsg(`Pipeline done: ${parts.join(", ")}`);
       fetchLeads();
     } catch (e) {
       setEnrichMsg(e instanceof Error ? e.message : "Pipeline failed");
     } finally {
       setPipelining(false);
       setTimeout(() => setEnrichMsg(""), 10000);
+    }
+  }
+
+  async function handleSmsBlast(template: number) {
+    setEnriching(true);
+    setEnrichMsg("");
+    try {
+      const res = await leadgenApi.smsBlast(template, {
+        county: county || undefined,
+      });
+      setEnrichMsg(
+        `SMS blast queued: ${res.queued} texts${res.skipped_opted_out > 0 ? `, ${res.skipped_opted_out} opted out` : ""}`
+      );
+    } catch (e) {
+      setEnrichMsg(e instanceof Error ? e.message : "SMS blast failed");
+    } finally {
+      setEnriching(false);
+      setTimeout(() => setEnrichMsg(""), 6000);
     }
   }
 
@@ -207,8 +228,45 @@ export default function DiscoveryPage() {
             disabled={enriching || pipelining}
             className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
           >
-            {enriching ? "Tracing..." : "Skip Trace Top 50"}
+            {enriching ? "Processing..." : "Skip Trace Top 50"}
           </button>
+          <div className="relative">
+            <button
+              onClick={() => setShowSmsPicker(!showSmsPicker)}
+              disabled={enriching || pipelining}
+              className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+            >
+              SMS Blast
+            </button>
+            {showSmsPicker && (
+              <div className="absolute right-0 top-full mt-1 z-50 w-72 rounded-lg bg-white shadow-lg border border-gray-200 py-1">
+                <p className="px-4 py-2 text-xs text-gray-500 border-b border-gray-100">
+                  Send to activated leads with phone numbers
+                </p>
+                <button
+                  onClick={() => { setShowSmsPicker(false); handleSmsBlast(1); }}
+                  className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                >
+                  <span className="font-medium">Message 1</span>
+                  <span className="block text-xs text-gray-400">Initial outreach — savings hook</span>
+                </button>
+                <button
+                  onClick={() => { setShowSmsPicker(false); handleSmsBlast(2); }}
+                  className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                >
+                  <span className="font-medium">Message 2</span>
+                  <span className="block text-xs text-gray-400">Follow-up — incentives urgency</span>
+                </button>
+                <button
+                  onClick={() => { setShowSmsPicker(false); handleSmsBlast(3); }}
+                  className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                >
+                  <span className="font-medium">Message 3</span>
+                  <span className="block text-xs text-gray-400">Final push — tax credit scarcity</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

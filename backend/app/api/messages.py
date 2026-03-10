@@ -15,7 +15,7 @@ from app.models.schema import (
     MessageDirection,
 )
 from app.services.compliance import check_can_message
-from app.workers.ai_tasks import task_send_sms
+from app.services.sms import send_sms_async
 
 router = APIRouter(prefix="/leads", tags=["messages"], dependencies=[Depends(get_current_user)])
 
@@ -115,7 +115,13 @@ async def send_message(
 
     await db.flush()
 
-    # Enqueue the actual send
-    task_send_sms.delay(lead_id, payload.message, payload.script_version_id)
+    # Send SMS directly via Twilio (no Celery/Redis dependency)
+    sms_result = await send_sms_async(lead.phone, payload.message)
 
-    return {"status": "queued", "message_id": msg.id}
+    # Always commit the message record so it appears in the thread
+    await db.commit()
+
+    if "error" in sms_result:
+        return {"status": "send_failed", "message_id": msg.id, "error": sms_result["error"]}
+
+    return {"status": "sent", "message_id": msg.id, "sid": sms_result.get("sid")}

@@ -172,8 +172,24 @@ def task_send_sms(lead_id: int, message: str, script_version_id: int | None = No
 
         db.commit()
 
-        # TODO: In production, call Twilio API here:
-        # twilio_client.messages.create(to=lead.phone, from_=settings.twilio_phone_number, body=message)
+        # Send via Twilio
+        if settings.twilio_account_sid and settings.twilio_auth_token and settings.twilio_phone_number:
+            try:
+                from twilio.rest import Client as TwilioClient
+                twilio = TwilioClient(settings.twilio_account_sid, settings.twilio_auth_token)
+                tw_msg = twilio.messages.create(
+                    to=lead.phone,
+                    from_=settings.twilio_phone_number,
+                    body=message,
+                )
+                # Store external message SID
+                msg.external_id = tw_msg.sid
+                db.commit()
+                logger.info("SMS sent to lead %d via Twilio (SID=%s)", lead_id, tw_msg.sid)
+            except Exception as e:
+                logger.error("Twilio SMS send failed for lead %d: %s", lead_id, e)
+        else:
+            logger.warning("Twilio not configured — SMS recorded but NOT sent for lead %d", lead_id)
 
 
 # ── Process Inbound SMS ──────────────────────────────────────────────────

@@ -84,6 +84,7 @@ export const leadgenApi = {
     traced: number;
     phones_found: number;
     activated: number;
+    sms_queued: number;
   }> => {
     return request("/discovered/full-pipeline", {
       method: "POST",
@@ -92,6 +93,26 @@ export const leadgenApi = {
         discovery_limit: opts.discovery_limit ?? 1000,
         trace_limit: opts.trace_limit ?? 100,
         min_score: opts.min_score ?? 50,
+      }),
+    });
+  },
+
+  smsBlast: async (
+    template: number = 1,
+    opts: { county?: string; limit?: number } = {}
+  ): Promise<{
+    status: string;
+    queued: number;
+    skipped_no_phone: number;
+    skipped_already_texted: number;
+    skipped_opted_out: number;
+  }> => {
+    return request("/discovered/sms-blast", {
+      method: "POST",
+      body: JSON.stringify({
+        template,
+        limit: opts.limit ?? 100,
+        county: opts.county,
       }),
     });
   },

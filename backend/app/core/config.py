@@ -62,6 +62,10 @@ class Settings(BaseSettings):
     # SMS auto-reply mode: False = suggest-only, True = auto-send
     sms_auto_reply_enabled: bool = False
 
+    # Scheduling / booking URL — link sent in outreach SMS
+    # e.g. Calendly link, Acuity Scheduling, or custom booking page
+    scheduling_url: str = ""
+
     # Webhook signature verification
     twilio_webhook_secret: str = ""
 

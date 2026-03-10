@@ -14,21 +14,57 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.connectors.md_sdat import run_discovery
+from app.core.config import get_settings
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.enrichment.pipeline import enrich_lead, skip_trace_leads, validate_contact
 from app.models.schema import (
+    ContactChannel,
     ContactEnrichment,
     ContactValidation,
     ConsentLog,
+    InboundMessage,
     Lead,
     LeadScore,
     LeadStatus,
+    MessageDirection,
     Property,
 )
 from app.services.scoring import score_lead
+from app.services.sms import send_sms_async
 
 router = APIRouter(tags=["discovery"], dependencies=[Depends(get_current_user)])
+
+import logging
+_logger = logging.getLogger(__name__)
+
+
+async def _send_and_record_sms(db: AsyncSession, lead: Lead, body: str) -> dict:
+    """Send an SMS via Twilio and record it in the message thread."""
+    settings = get_settings()
+    from_number = settings.twilio_phone_number or "+10000000000"
+
+    # Record the outbound message in the thread
+    msg = InboundMessage(
+        lead_id=lead.id,
+        direction=MessageDirection.outbound,
+        channel=ContactChannel.sms,
+        from_number=from_number,
+        to_number=lead.phone,
+        body=body,
+        sent_by="system",
+    )
+    db.add(msg)
+    await db.flush()
+
+    # Send via Twilio
+    result = await send_sms_async(lead.phone, body)
+    if "error" in result:
+        _logger.warning("SMS send failed for lead %d: %s", lead.id, result["error"])
+    else:
+        _logger.info("SMS sent to lead %d (SID=%s)", lead.id, result.get("sid"))
+
+    return result
 
 
 # ── Status mapping ─────────────────────────────────────────────────────
@@ -799,6 +835,8 @@ class FullPipelineResponse(BaseModel):
     phones_found: int
     # Activation phase
     activated: int
+    # SMS phase
+    sms_queued: int
 
 
 @router.post("/discovered/full-pipeline", response_model=FullPipelineResponse)
@@ -862,10 +900,35 @@ async def run_full_pipeline(
     activated = await _auto_activate_traced_leads(db, lead_ids) if lead_ids else 0
     await db.commit()
 
+    # Phase 4: Auto-send initial SMS to newly activated leads
+    sms_queued = 0
+    settings = get_settings()
+    if settings.scheduling_url and activated > 0:
+        logger.info("Pipeline Phase 4: Auto-SMS to %d activated leads", activated)
+        # Find the just-activated leads with phones that haven't been texted
+        sms_query = (
+            select(Lead, Property)
+            .join(Property, Lead.property_id == Property.id)
+            .where(
+                Lead.id.in_(lead_ids),
+                Lead.status == LeadStatus.contacting,
+                Lead.phone.isnot(None),
+                Lead.phone != "",
+                Lead.total_sms_sent == 0,
+            )
+        )
+        sms_result = await db.execute(sms_query)
+        for lead, prop in sms_result.all():
+            body = _build_sms_body(1, lead, prop, settings.scheduling_url)
+            await _send_and_record_sms(db, lead, body)
+            sms_queued += 1
+    elif not settings.scheduling_url:
+        logger.info("Pipeline Phase 4: Skipped SMS — SCHEDULING_URL not set")
+
     logger.info(
-        "Pipeline complete: county=%s discovered=%d scored=%d traced=%d phones=%d activated=%d",
+        "Pipeline complete: county=%s discovered=%d scored=%d traced=%d phones=%d activated=%d sms=%d",
         payload.county, discovery_result["ingested"], discovery_result["scored"],
-        traced, phones_found, activated,
+        traced, phones_found, activated, sms_queued,
     )
 
     return FullPipelineResponse(
@@ -876,6 +939,7 @@ async def run_full_pipeline(
         traced=traced,
         phones_found=phones_found,
         activated=activated,
+        sms_queued=sms_queued,
     )
 
 
@@ -990,6 +1054,165 @@ async def reject_lead(
     lead.status = LeadStatus.disqualified
     await db.flush()
     return {"status": "rejected"}
+
+
+# ── SMS Outreach ─────────────────────────────────────────────────────
+
+# 3-message drip sequence — personalized, short, high-converting
+SMS_TEMPLATES = {
+    1: (
+        "Hi {first_name}, your home at {address} qualified for a free solar savings "
+        "assessment. Most {county} homeowners save $80-150/mo. See what you'd save: "
+        "{link}\n\nReply STOP to opt out"
+    ),
+    2: (
+        "{first_name}, quick follow-up — did you get a chance to check your solar "
+        "savings estimate? {county} has some of the best incentives right now and "
+        "they won't last. Grab your spot: {link}\n\nReply STOP to opt out"
+    ),
+    3: (
+        "Last chance {first_name}! The 30% federal solar tax credit is dropping soon. "
+        "Your home on {address} qualifies right now. Free assessment, zero "
+        "pressure: {link}\n\nReply STOP to opt out"
+    ),
+}
+
+
+def _build_sms_body(
+    template_num: int,
+    lead: "Lead",
+    prop: "Property",
+    scheduling_url: str,
+) -> str:
+    """Fill an SMS template with lead + property data."""
+    first_name = (lead.first_name or "there").title()
+    address = (prop.address_line1 or "your property").title()
+    county = (prop.county or "your area").replace(" County", "")
+
+    # Build personalized link with portal token for tracking
+    link = scheduling_url
+    if lead.portal_token:
+        sep = "&" if "?" in scheduling_url else "?"
+        link = f"{scheduling_url}{sep}ref={lead.portal_token}"
+
+    return SMS_TEMPLATES[template_num].format(
+        first_name=first_name,
+        address=address,
+        county=county,
+        link=link,
+    )
+
+
+class SmsBlastRequest(BaseModel):
+    county: str | None = None
+    limit: int = 100
+    template: int = 1  # Which message in the drip: 1, 2, or 3
+
+
+class SmsBlastResponse(BaseModel):
+    status: str
+    queued: int
+    skipped_no_phone: int
+    skipped_already_texted: int
+    skipped_opted_out: int
+
+
+@router.post("/discovered/sms-blast", response_model=SmsBlastResponse)
+async def sms_blast(
+    payload: SmsBlastRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    """Send an SMS to activated leads that have a phone number.
+
+    Uses the 3-message drip sequence:
+      template=1 → Initial outreach (day 0)
+      template=2 → Follow-up (day 2-3)
+      template=3 → Urgency / last chance (day 5-7)
+
+    Only texts leads in 'contacting' status who haven't received this
+    template number yet (based on total_sms_sent count).
+    """
+    from app.models.schema import ConsentStatus
+
+    settings = get_settings()
+    if not settings.scheduling_url:
+        raise HTTPException(
+            status_code=400,
+            detail="SCHEDULING_URL not configured. Set it in .env (e.g. your Calendly link)",
+        )
+
+    if payload.template not in SMS_TEMPLATES:
+        raise HTTPException(status_code=400, detail="template must be 1, 2, or 3")
+
+    # Find activated leads with phone numbers
+    query = (
+        select(Lead, Property)
+        .join(Property, Lead.property_id == Property.id)
+        .where(
+            Lead.status == LeadStatus.contacting,
+            Lead.phone.isnot(None),
+            Lead.phone != "",
+        )
+    )
+
+    if payload.county:
+        query = query.where(Property.county == payload.county)
+
+    # Only text leads who haven't received this template yet
+    # template 1 = 0 SMS sent, template 2 = 1 sent, template 3 = 2 sent
+    query = query.where(Lead.total_sms_sent == payload.template - 1)
+    query = query.limit(payload.limit)
+
+    result = await db.execute(query)
+    rows = result.all()
+
+    queued = 0
+    skipped_no_phone = 0
+    skipped_opted_out = 0
+
+    for lead, prop in rows:
+        # Skip DNC
+        if lead.status == LeadStatus.dnc:
+            skipped_opted_out += 1
+            continue
+
+        # Check opt-out
+        opted_out = await db.execute(
+            select(ConsentLog.id)
+            .where(ConsentLog.lead_id == lead.id, ConsentLog.status == ConsentStatus.opted_out)
+            .limit(1)
+        )
+        if opted_out.scalar_one_or_none():
+            skipped_opted_out += 1
+            continue
+
+        # Build personalized message
+        body = _build_sms_body(payload.template, lead, prop, settings.scheduling_url)
+
+        # Send directly via Twilio + record in message thread
+        await _send_and_record_sms(db, lead, body)
+        queued += 1
+
+    return SmsBlastResponse(
+        status="queued",
+        queued=queued,
+        skipped_no_phone=skipped_no_phone,
+        skipped_already_texted=len(rows) - queued - skipped_opted_out,
+        skipped_opted_out=skipped_opted_out,
+    )
+
+
+@router.get("/sms/templates")
+async def list_sms_templates():
+    """Return the available SMS drip templates (for preview in UI)."""
+    return [
+        {"template": num, "body": body, "description": desc}
+        for num, body, desc in [
+            (1, SMS_TEMPLATES[1], "Initial outreach — curiosity + savings hook"),
+            (2, SMS_TEMPLATES[2], "Follow-up — urgency + incentives"),
+            (3, SMS_TEMPLATES[3], "Final push — tax credit deadline scarcity"),
+        ]
+    ]
 
 
 # ── Source endpoints ──────────────────────────────────────────────────

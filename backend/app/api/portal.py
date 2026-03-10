@@ -13,6 +13,11 @@ from sqlalchemy.orm import selectinload
 
 from app.core.database import get_db
 from app.services.email import send_new_lead_notification
+from app.services.sms import (
+    appointment_confirmation_sms,
+    quote_confirmation_sms,
+    send_sms_async,
+)
 from app.models.schema import (
     Appointment,
     AppointmentStatus,
@@ -162,6 +167,26 @@ async def submit_quote(data: QuoteRequest):
             zip_code=data.zip_code,
         )
 
+        # Send confirmation SMS to the customer
+        sms_body = quote_confirmation_sms(data.first_name)
+        sms_result = await send_sms_async(data.phone, sms_body)
+
+        # Record the outbound SMS in the message thread
+        async for db2 in get_db():
+            from app.core.config import get_settings
+            settings = get_settings()
+            outbound_msg = InboundMessage(
+                lead_id=lead.id,
+                direction=MessageDirection.outbound,
+                channel=ContactChannel.sms,
+                from_number=settings.twilio_phone_number or "+10000000000",
+                to_number=data.phone,
+                body=sms_body,
+                sent_by="system",
+            )
+            db2.add(outbound_msg)
+            await db2.commit()
+
         return {
             "token": token,
             "message": "Thank you! Your free solar quote request has been received.",
@@ -261,6 +286,28 @@ async def request_appointment(token: str, data: AppointmentRequest):
         lead.status = LeadStatus.appointment_set
         await db.commit()
         await db.refresh(apt)
+
+        # Send appointment confirmation SMS
+        date_str = data.preferred_date.strftime("%A, %B %d")
+        sms_body = appointment_confirmation_sms(
+            lead.first_name or "there", date_str, data.time_preference
+        )
+        await send_sms_async(lead.phone, sms_body)
+
+        # Record the outbound SMS
+        from app.core.config import get_settings
+        settings = get_settings()
+        outbound_msg = InboundMessage(
+            lead_id=lead.id,
+            direction=MessageDirection.outbound,
+            channel=ContactChannel.sms,
+            from_number=settings.twilio_phone_number or "+10000000000",
+            to_number=lead.phone,
+            body=sms_body,
+            sent_by="system",
+        )
+        db.add(outbound_msg)
+        await db.commit()
 
         return {
             "appointment_id": apt.id,

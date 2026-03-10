@@ -16,6 +16,7 @@ from app.models.schema import (
     Lead,
     LeadStatus,
     OutreachAttempt,
+    Property,
 )
 from app.workers.celery_app import celery_app
 
@@ -159,9 +160,30 @@ def _simulate_outreach(db: Session, attempt: OutreachAttempt):
             lead.status = status_map.get(chosen, LeadStatus.contacting)
 
     elif attempt.channel == ContactChannel.sms:
+        # Build the appropriate SMS based on outreach count
+        from app.services.sms import (
+            followup_1_sms,
+            followup_2_sms,
+            initial_outreach_sms,
+            send_sms,
+        )
+
+        first_name = lead.first_name or "there"
+        if lead.total_sms_sent == 0:
+            prop = db.get(Property, lead.property_id) if lead.property_id else None
+            address = prop.address_line1 if prop else "your home"
+            sms_body = initial_outreach_sms(first_name, address)
+        elif lead.total_sms_sent == 1:
+            sms_body = followup_1_sms(first_name)
+        else:
+            sms_body = followup_2_sms(first_name)
+
+        # Send via Twilio
+        sms_result = send_sms(lead.phone, sms_body)
+
         attempt.disposition = ContactDisposition.completed
         attempt.ended_at = now
-        attempt.message_body = "[SIMULATED] SMS sent"
+        attempt.message_body = sms_body
         # Atomic counter increment
         db.execute(
             update(Lead)
