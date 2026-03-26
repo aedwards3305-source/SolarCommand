@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import admin, ai_routes, appointments, auth, cost_center, dashboard, discovery, insights, leads, messages, nba, outreach, portal, qa, scripts, vapi_tools, webhooks
+from app.api import admin, ai_routes, appointments, auth, cost_center, dashboard, discovery, insights, leads, messages, nba, outreach, portal, qa, sales_board, scripts, vapi_tools, webhooks
 from app.core.config import get_settings
 
 
@@ -53,6 +53,7 @@ app.include_router(cost_center.router)
 app.include_router(vapi_tools.router)
 app.include_router(discovery.router)
 app.include_router(portal.router)
+app.include_router(sales_board.router)
 
 
 @app.get("/health")

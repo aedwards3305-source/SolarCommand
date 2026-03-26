@@ -566,4 +566,107 @@ export const api = {
       has_more: boolean;
     }>(`/admin/cost-center/items${qs}`);
   },
+
+  // Sales Board
+  getSalesStats: () =>
+    request<{
+      appointments_today: number;
+      appointments_this_week: number;
+      appointments_completed: number;
+      appointments_no_show: number;
+      my_total_leads: number;
+      my_hot_leads: number;
+      my_warm_leads: number;
+      my_qualified_leads: number;
+      my_appointment_set: number;
+      closed_won: number;
+      closed_lost: number;
+      close_rate: number;
+      total_outreach: number;
+      calls_made: number;
+      sms_sent: number;
+      emails_sent: number;
+      follow_ups_due_today: number;
+      avg_lead_score: number | null;
+    }>("/sales/my-stats"),
+
+  getMyAppointments: () =>
+    request<{
+      today: Array<{
+        id: number;
+        lead_id: number;
+        lead_name: string | null;
+        lead_phone: string | null;
+        address: string | null;
+        status: string;
+        scheduled_start: string;
+        scheduled_end: string;
+        notes: string | null;
+        lead_score: number | null;
+      }>;
+      upcoming: Array<{
+        id: number;
+        lead_id: number;
+        lead_name: string | null;
+        lead_phone: string | null;
+        address: string | null;
+        status: string;
+        scheduled_start: string;
+        scheduled_end: string;
+        notes: string | null;
+        lead_score: number | null;
+      }>;
+      recent_completed: Array<{
+        id: number;
+        lead_id: number;
+        lead_name: string | null;
+        lead_phone: string | null;
+        address: string | null;
+        status: string;
+        scheduled_start: string;
+        scheduled_end: string;
+        notes: string | null;
+        lead_score: number | null;
+      }>;
+    }>("/sales/my-appointments"),
+
+  getMyPipeline: () =>
+    request<{
+      stages: Array<{
+        stage: string;
+        label: string;
+        count: number;
+        leads: Array<{
+          id: number;
+          name: string;
+          phone: string | null;
+          created_at: string | null;
+        }>;
+      }>;
+      total_pipeline_leads: number;
+    }>("/sales/my-pipeline"),
+
+  getMyActivity: (limit?: number) =>
+    request<
+      Array<{
+        id: number;
+        type: string;
+        description: string;
+        lead_id: number | null;
+        lead_name: string | null;
+        timestamp: string;
+        meta: Record<string, string> | null;
+      }>
+    >(`/sales/my-activity${limit ? `?limit=${limit}` : ""}`),
+
+  getLeaderboard: () =>
+    request<
+      Array<{
+        rep_id: number;
+        rep_name: string;
+        closed_won: number;
+        appointments_completed: number;
+        total_leads: number;
+      }>
+    >("/sales/leaderboard"),
 };
