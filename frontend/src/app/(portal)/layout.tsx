@@ -94,12 +94,19 @@ export default function PortalLayout({
               &copy; {new Date().getFullYear()} Solar Command. All rights
               reserved. Powered by Sunburst Solar.
             </p>
-            <p className="mt-2">
+            <p className="mt-2 flex items-center justify-center gap-3">
               <Link
                 href="/privacy-policy"
                 className="hover:text-white transition-colors"
               >
                 Privacy Policy
+              </Link>
+              <span className="text-gray-600">&middot;</span>
+              <Link
+                href="/terms"
+                className="hover:text-white transition-colors"
+              >
+                Terms &amp; Conditions
               </Link>
             </p>
           </div>
