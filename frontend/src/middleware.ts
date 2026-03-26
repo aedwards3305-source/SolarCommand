@@ -21,6 +21,8 @@ export function middleware(request: NextRequest) {
     "/discovery",
     "/activation",
     "/admin",
+    "/sales-board",
+    "/settings",
   ];
 
   const isProtected = protectedPrefixes.some((p) => pathname.startsWith(p));
