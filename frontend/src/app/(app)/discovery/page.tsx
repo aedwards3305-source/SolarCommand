@@ -391,6 +391,7 @@ export default function DiscoveryPage() {
                   <tr>
                     <th className="px-4 py-3 text-left">Address</th>
                     <th className="px-3 py-3 text-left">Score</th>
+                    <th className="px-3 py-3 text-left">Contact</th>
                     <th className="px-3 py-3 text-left">Type</th>
                     <th className="px-3 py-3 text-left">Utility</th>
                     <th className="px-3 py-3 text-left">Sources</th>
@@ -418,6 +419,27 @@ export default function DiscoveryPage() {
                           <span className={cn("inline-flex rounded-full px-2 py-0.5 text-xs font-medium", badge.cls)}>
                             {badge.label}
                           </span>
+                        </td>
+                        <td className="px-3 py-3">
+                          {lead.best_phone || lead.owner_name ? (
+                            <div className="space-y-0.5">
+                              {lead.owner_name && (
+                                <p className="text-xs font-medium text-gray-900">{lead.owner_name}</p>
+                              )}
+                              {lead.best_phone && (
+                                <p className="text-xs text-gray-600">
+                                  {lead.best_phone}
+                                  {lead.best_phone_type && (
+                                    <span className="ml-1 text-[10px] text-gray-400">({lead.best_phone_type})</span>
+                                  )}
+                                </p>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-500">
+                              No contact
+                            </span>
+                          )}
                         </td>
                         <td className="px-3 py-3 text-gray-600">
                           {lead.property_type?.replace(/_/g, " ") ?? "—"}
