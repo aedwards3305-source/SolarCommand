@@ -61,9 +61,29 @@ export const api = {
       id: number;
       email: string;
       name: string;
+      phone: string | null;
       role: string;
       is_active: boolean;
     }>("/auth/me"),
+
+  updateProfile: (data: {
+    name?: string;
+    phone?: string;
+    email?: string;
+    current_password?: string;
+    new_password?: string;
+  }) =>
+    request<{
+      id: number;
+      email: string;
+      name: string;
+      phone: string | null;
+      role: string;
+      is_active: boolean;
+    }>("/auth/me", {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
 
   // Dashboard
   getKPIs: () =>
@@ -238,6 +258,27 @@ export const api = {
   }) =>
     request("/appointments", {
       method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  updateAppointment: (id: number, data: {
+    scheduled_start?: string;
+    scheduled_end?: string;
+    notes?: string;
+    status?: string;
+  }) =>
+    request<{
+      id: number;
+      lead_id: number;
+      rep_id: number;
+      rep_name: string | null;
+      status: string;
+      scheduled_start: string;
+      scheduled_end: string;
+      address: string | null;
+      notes: string | null;
+    }>(`/appointments/${id}`, {
+      method: "PUT",
       body: JSON.stringify(data),
     }),
 

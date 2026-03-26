@@ -24,6 +24,7 @@ interface User {
   id: number;
   email: string;
   name: string;
+  phone: string | null;
   role: string;
 }
 
@@ -33,6 +34,7 @@ interface AuthContextType {
   hasToken: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -41,6 +43,7 @@ const AuthContext = createContext<AuthContextType>({
   hasToken: false,
   login: async () => {},
   logout: () => {},
+  refreshUser: async () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -86,8 +89,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       id: res.user_id,
       email: res.email,
       name: res.name,
+      phone: null,
       role: res.role,
     });
+  }, []);
+
+  const refreshUser = useCallback(async () => {
+    const u = await api.me();
+    setUser(u);
   }, []);
 
   const logout = useCallback(() => {
@@ -98,7 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, hasToken, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, hasToken, login, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

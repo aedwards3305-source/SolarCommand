@@ -91,6 +91,53 @@ async def get_me(current_user: RepUser = Depends(get_current_user)):
     )
 
 
+class ProfileUpdate(BaseModel):
+    name: str | None = None
+    phone: str | None = None
+    email: str | None = None
+    current_password: str | None = None
+    new_password: str | None = None
+
+
+@router.patch("/me", response_model=UserOut)
+async def update_profile(
+    payload: ProfileUpdate,
+    current_user: RepUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Update the currently authenticated user's profile."""
+    if payload.name is not None:
+        current_user.name = payload.name
+    if payload.phone is not None:
+        current_user.phone = payload.phone
+    if payload.email is not None:
+        # Check uniqueness
+        existing = await db.execute(
+            select(RepUser).where(RepUser.email == payload.email, RepUser.id != current_user.id)
+        )
+        if existing.scalar_one_or_none():
+            raise HTTPException(status_code=409, detail="Email already in use")
+        current_user.email = payload.email
+
+    if payload.new_password:
+        if not payload.current_password:
+            raise HTTPException(status_code=400, detail="Current password required to set new password")
+        if current_user.password_hash and not verify_password(payload.current_password, current_user.password_hash):
+            raise HTTPException(status_code=400, detail="Current password is incorrect")
+        current_user.password_hash = hash_password(payload.new_password)
+
+    await db.flush()
+
+    return UserOut(
+        id=current_user.id,
+        email=current_user.email,
+        name=current_user.name,
+        phone=current_user.phone,
+        role=current_user.role.value,
+        is_active=current_user.is_active,
+    )
+
+
 @router.post(
     "/register",
     response_model=UserOut,

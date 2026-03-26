@@ -98,6 +98,87 @@ async def create_appointment(
     )
 
 
+class AppointmentUpdate(BaseModel):
+    scheduled_start: datetime | None = None
+    scheduled_end: datetime | None = None
+    notes: str | None = None
+    status: str | None = None
+
+
+@router.put("/{appt_id}", response_model=AppointmentOut)
+async def update_appointment(
+    appt_id: int,
+    payload: AppointmentUpdate,
+    current_user: RepUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Update an appointment — reschedule, change status, edit notes."""
+    appt = await db.get(Appointment, appt_id)
+    if not appt:
+        raise HTTPException(status_code=404, detail="Appointment not found")
+
+    old_start = appt.scheduled_start.isoformat()
+    old_status = appt.status.value
+
+    if payload.scheduled_start is not None:
+        appt.scheduled_start = payload.scheduled_start
+    if payload.scheduled_end is not None:
+        appt.scheduled_end = payload.scheduled_end
+    if payload.notes is not None:
+        appt.notes = payload.notes
+    if payload.status is not None:
+        try:
+            new_status = AppointmentStatus(payload.status)
+        except ValueError:
+            raise HTTPException(status_code=400, detail=f"Invalid status: {payload.status}")
+        appt.status = new_status
+
+        # If rescheduled, update the status
+        if new_status == AppointmentStatus.rescheduled and payload.scheduled_start:
+            appt.status = AppointmentStatus.scheduled
+
+        # Sync lead status on completion or cancellation
+        lead = await db.get(Lead, appt.lead_id)
+        if lead:
+            if new_status == AppointmentStatus.completed:
+                lead.status = LeadStatus.qualified
+            elif new_status == AppointmentStatus.cancelled:
+                # Revert to previous pipeline stage
+                if lead.status == LeadStatus.appointment_set:
+                    lead.status = LeadStatus.contacted
+
+    changes = []
+    if payload.scheduled_start and old_start != appt.scheduled_start.isoformat():
+        changes.append(f"rescheduled from {old_start}")
+    if payload.status and old_status != appt.status.value:
+        changes.append(f"status {old_status} → {appt.status.value}")
+
+    if changes:
+        db.add(AuditLog(
+            actor=current_user.name,
+            action="appointment.updated",
+            entity_type="appointment",
+            entity_id=appt.id,
+            old_value=f"start={old_start}, status={old_status}",
+            new_value="; ".join(changes),
+        ))
+
+    await db.flush()
+
+    rep = await db.get(RepUser, appt.rep_id)
+    return AppointmentOut(
+        id=appt.id,
+        lead_id=appt.lead_id,
+        rep_id=appt.rep_id,
+        rep_name=rep.name if rep else None,
+        status=appt.status.value,
+        scheduled_start=appt.scheduled_start.isoformat(),
+        scheduled_end=appt.scheduled_end.isoformat(),
+        address=appt.address,
+        notes=appt.notes,
+    )
+
+
 @router.get("", response_model=list[AppointmentOut])
 async def list_appointments(
     db: AsyncSession = Depends(get_db),
