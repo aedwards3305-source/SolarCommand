@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.connectors.md_sdat import normalize_address
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.schema import (
@@ -219,6 +220,21 @@ async def ingest_property(payload: PropertyIngest, db: AsyncSession = Depends(ge
                 detail=f"Property with parcel_id {payload.parcel_id} already exists",
             )
 
+    # Check for duplicate by normalized address + zip
+    norm_addr = normalize_address(payload.address_line1)
+    if norm_addr and payload.zip_code:
+        dup_addr = await db.execute(
+            select(Property.id).where(
+                func.upper(Property.address_line1) == norm_addr.upper(),
+                Property.zip_code == payload.zip_code,
+            )
+        )
+        if dup_addr.scalar_one_or_none():
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Property at {payload.address_line1}, {payload.zip_code} already exists",
+            )
+
     # Map property type string to enum
     try:
         prop_type = PropertyType(payload.property_type)
@@ -226,7 +242,7 @@ async def ingest_property(payload: PropertyIngest, db: AsyncSession = Depends(ge
         prop_type = PropertyType.OTHER
 
     prop = Property(
-        address_line1=payload.address_line1,
+        address_line1=norm_addr,
         address_line2=payload.address_line2,
         city=payload.city,
         state=payload.state,
@@ -692,12 +708,27 @@ async def ingest_csv(file: UploadFile = File(...), db: AsyncSession = Depends(ge
         try:
             parcel_id = row.get("parcel_id", "").strip() or None
 
-            # Check duplicate
+            # Check duplicate by parcel_id
             if parcel_id:
                 existing = await db.execute(
                     select(Property).where(Property.parcel_id == parcel_id)
                 )
                 if existing.scalar_one_or_none():
+                    skipped += 1
+                    continue
+
+            # Check duplicate by normalized address + zip
+            raw_addr = row.get("address_line1", "").strip()
+            raw_zip = row.get("zip_code", "").strip()
+            if raw_addr and raw_zip:
+                norm_addr = normalize_address(raw_addr)
+                dup_addr = await db.execute(
+                    select(Property.id).where(
+                        func.upper(Property.address_line1) == norm_addr.upper(),
+                        Property.zip_code == raw_zip,
+                    )
+                )
+                if dup_addr.scalar_one_or_none():
                     skipped += 1
                     continue
 
@@ -724,7 +755,7 @@ async def ingest_csv(file: UploadFile = File(...), db: AsyncSession = Depends(ge
                 return val.strip().lower() in ("true", "1", "yes", "t")
 
             prop = Property(
-                address_line1=row.get("address_line1", "").strip(),
+                address_line1=normalize_address(row.get("address_line1", "").strip()),
                 address_line2=row.get("address_line2", "").strip() or None,
                 city=row.get("city", "").strip(),
                 state=row.get("state", "MD").strip() or "MD",

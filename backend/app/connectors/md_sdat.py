@@ -51,6 +51,36 @@ F_PREM_TYPE = "premise_address_type_mdp_field_premstyp_sdat_field_24"
 F_PREM_CITY = "premise_address_city_mdp_field_premcity_sdat_field_25"
 F_PREM_ZIP = "premise_address_zip_code_mdp_field_premzip_sdat_field_26"
 
+# Street suffix normalization — collapse common variants so dedup works
+_SUFFIX_MAP: dict[str, str] = {
+    "STREET": "ST", "AVENUE": "AVE", "BOULEVARD": "BLVD", "DRIVE": "DR",
+    "COURT": "CT", "PLACE": "PL", "LANE": "LN", "ROAD": "RD",
+    "CIRCLE": "CIR", "TERRACE": "TER", "TRAIL": "TRL", "PARKWAY": "PKWY",
+    "WAY": "WAY", "HIGHWAY": "HWY", "NORTH": "N", "SOUTH": "S",
+    "EAST": "E", "WEST": "W", "NORTHEAST": "NE", "NORTHWEST": "NW",
+    "SOUTHEAST": "SE", "SOUTHWEST": "SW",
+}
+
+_SUFFIX_RE = re.compile(
+    r"\b(" + "|".join(_SUFFIX_MAP.keys()) + r")\b", re.IGNORECASE,
+)
+
+
+def normalize_address(raw: str) -> str:
+    """Normalize an address for dedup comparison.
+
+    - Uppercase
+    - Collapse whitespace
+    - Replace common street suffix long forms with abbreviations
+    - Strip trailing punctuation
+    """
+    addr = raw.strip().upper()
+    addr = re.sub(r"[.,#]+", " ", addr)
+    addr = _SUFFIX_RE.sub(lambda m: _SUFFIX_MAP[m.group(1).upper()], addr)
+    addr = re.sub(r"\s+", " ", addr).strip()
+    return addr
+
+
 # Land-use code extraction: "Residential (R)" → "R"
 LAND_USE_RE = re.compile(r"\(([^)]+)\)")
 
@@ -262,7 +292,7 @@ def map_to_property_kwargs(record: dict[str, Any]) -> dict[str, Any]:
     zip_code = (record.get(F_ZIP) or record.get(F_PREM_ZIP) or "").strip()
 
     return {
-        "address_line1": _build_address(record),
+        "address_line1": normalize_address(_build_address(record)),
         "city": city.title(),  # "COCKEYSVILLE" → "Cockeysville"
         "state": "MD",
         "zip_code": zip_code,
@@ -325,10 +355,11 @@ async def run_discovery(
                     skipped += 1
                     continue
 
-            # Also deduplicate by address + zip
+            # Also deduplicate by normalized address + zip
+            from sqlalchemy import func as sa_func
             existing_addr = await db.execute(
                 select(Property.id).where(
-                    Property.address_line1 == kwargs["address_line1"],
+                    sa_func.upper(Property.address_line1) == kwargs["address_line1"].upper(),
                     Property.zip_code == kwargs["zip_code"],
                 )
             )
