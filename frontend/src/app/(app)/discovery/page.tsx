@@ -51,6 +51,7 @@ export default function DiscoveryPage() {
   const [maxScore, setMaxScore] = useState(100);
   const [status, setStatus] = useState<DiscoveryStatus | "">("");
   const [hasPermit, setHasPermit] = useState(false);
+  const [contactFilter, setContactFilter] = useState<"" | "has_contact" | "no_contact">("");
   const [page, setPage] = useState(1);
   const pageSize = 25;
 
@@ -162,6 +163,14 @@ export default function DiscoveryPage() {
       setTimeout(() => setEnrichMsg(""), 6000);
     }
   }
+
+  const filteredLeads = contactFilter
+    ? leads.filter((l) =>
+        contactFilter === "has_contact"
+          ? !!(l.best_phone || l.owner_name)
+          : !(l.best_phone || l.owner_name)
+      )
+    : leads;
 
   const totalPages = Math.ceil(total / pageSize);
 
@@ -327,11 +336,23 @@ export default function DiscoveryPage() {
               <option value="rejected">Rejected</option>
             </select>
           </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">Contact</label>
+            <select
+              value={contactFilter}
+              onChange={(e) => { setContactFilter(e.target.value as "" | "has_contact" | "no_contact"); setPage(1); }}
+              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-solar-500 outline-none"
+            >
+              <option value="">All</option>
+              <option value="has_contact">Has Contact</option>
+              <option value="no_contact">No Contact</option>
+            </select>
+          </div>
           <label className="flex items-center gap-2 text-sm text-gray-700 pb-2">
             <input type="checkbox" checked={hasPermit} onChange={(e) => { setHasPermit(e.target.checked); setPage(1); }} className="rounded border-gray-300 text-solar-600 focus:ring-solar-500" />
             Has Permit
           </label>
-          <button onClick={() => { setCounty(""); setMinScore(0); setMaxScore(100); setStatus(""); setHasPermit(false); setPage(1); }} className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-600 hover:bg-gray-50">
+          <button onClick={() => { setCounty(""); setMinScore(0); setMaxScore(100); setStatus(""); setHasPermit(false); setContactFilter(""); setPage(1); }} className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-600 hover:bg-gray-50">
             Reset Filters
           </button>
         </div>
@@ -341,7 +362,7 @@ export default function DiscoveryPage() {
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2" style={{ minHeight: "500px" }}>
         {/* Map */}
         <div className="h-[500px] xl:h-auto">
-          <DiscoveryMap leads={leads} onSelectLead={setSelectedLead} />
+          <DiscoveryMap leads={filteredLeads} onSelectLead={setSelectedLead} />
           {/* Map popup */}
           {selectedLead && (
             <div className="mt-2 rounded-xl bg-white p-4 shadow-sm border border-gray-200">
@@ -398,7 +419,7 @@ export default function DiscoveryPage() {
           <div className="flex-1 overflow-auto">
             {loading ? (
               <div className="p-8 text-center text-gray-400 animate-pulse">Loading discovered leads...</div>
-            ) : leads.length === 0 ? (
+            ) : filteredLeads.length === 0 ? (
               <div className="p-8 text-center text-gray-400">No leads match filters</div>
             ) : (
               <table className="min-w-full text-sm">
@@ -414,7 +435,7 @@ export default function DiscoveryPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {leads.map((lead) => {
+                  {filteredLeads.map((lead) => {
                     const badge = scoreBadge(lead.discovery_score);
                     return (
                       <tr key={lead.id} className="hover:bg-gray-50">
