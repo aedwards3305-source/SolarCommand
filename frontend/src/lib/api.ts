@@ -710,4 +710,78 @@ export const api = {
         total_leads: number;
       }>
     >("/sales/leaderboard"),
+
+  // Deals / Sales
+  createDeal: (data: {
+    lead_id: number;
+    contract_value: number;
+    system_size_kw: number;
+    financing_type?: string;
+    commission_amount?: number;
+    adders_total?: number;
+    panel_count?: number;
+    panel_brand?: string;
+    inverter_type?: string;
+    battery_included?: boolean;
+    annual_production_kwh?: number;
+    sale_date: string;
+    install_date?: string;
+    notes?: string;
+  }) =>
+    request<Deal>("/sales/deals", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  getDeals: (params?: Record<string, string>) => {
+    const qs = params ? "?" + new URLSearchParams(params).toString() : "";
+    return request<Deal[]>(`/sales/deals${qs}`);
+  },
+
+  getDeal: (id: number) => request<Deal>(`/sales/deals/${id}`),
+
+  updateDeal: (id: number, data: Record<string, unknown>) =>
+    request<Deal>(`/sales/deals/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+
+  getDealsSummary: (mineOnly?: boolean) =>
+    request<{
+      total_deals: number;
+      total_revenue: number;
+      total_commission: number;
+      avg_deal_value: number;
+      total_kw_sold: number;
+      deals_by_status: Record<string, number>;
+      deals_by_financing: Record<string, number>;
+    }>(`/sales/deals/summary${mineOnly ? "?mine_only=true" : ""}`),
 };
+
+// Shared Deal type
+export interface Deal {
+  id: number;
+  lead_id: number;
+  rep_id: number;
+  rep_name: string | null;
+  contract_value: number;
+  system_size_kw: number;
+  financing_type: string;
+  commission_amount: number | null;
+  adders_total: number | null;
+  panel_count: number | null;
+  panel_brand: string | null;
+  inverter_type: string | null;
+  battery_included: boolean;
+  annual_production_kwh: number | null;
+  status: string;
+  sale_date: string;
+  install_date: string | null;
+  pto_date: string | null;
+  customer_name: string;
+  customer_address: string | null;
+  customer_phone: string | null;
+  customer_email: string | null;
+  notes: string | null;
+  created_at: string;
+}

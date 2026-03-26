@@ -22,6 +22,7 @@ export function middleware(request: NextRequest) {
     "/activation",
     "/admin",
     "/sales-board",
+    "/sales-log",
     "/settings",
   ];
 

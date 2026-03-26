@@ -897,3 +897,82 @@ class ContactValidation(Base):
     __table_args__ = (
         Index("ix_validation_lead_id", "lead_id"),
     )
+
+
+# ── Sales / Deals ─────────────────────────────────────────────────────────
+
+
+class FinancingType(str, enum.Enum):
+    cash = "cash"
+    loan = "loan"
+    lease = "lease"
+    ppa = "ppa"
+    other = "other"
+
+
+class DealStatus(str, enum.Enum):
+    pending_contract = "pending_contract"
+    contract_signed = "contract_signed"
+    permit_submitted = "permit_submitted"
+    scheduled_install = "scheduled_install"
+    installed = "installed"
+    pto_granted = "pto_granted"  # Permission to Operate
+    cancelled = "cancelled"
+
+
+class Sale(Base):
+    __tablename__ = "sale"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    lead_id: Mapped[int] = mapped_column(ForeignKey("lead.id"), nullable=False)
+    rep_id: Mapped[int] = mapped_column(ForeignKey("rep_user.id"), nullable=False)
+
+    # Deal financials
+    contract_value: Mapped[float] = mapped_column(Float, nullable=False)
+    financing_type: Mapped[FinancingType] = mapped_column(
+        Enum(FinancingType), default=FinancingType.cash
+    )
+    commission_amount: Mapped[float | None] = mapped_column(Float)
+    adders_total: Mapped[float | None] = mapped_column(Float)  # battery, critter guard, etc.
+
+    # System specs
+    system_size_kw: Mapped[float] = mapped_column(Float, nullable=False)
+    panel_count: Mapped[int | None] = mapped_column(Integer)
+    panel_brand: Mapped[str | None] = mapped_column(String(100))
+    inverter_type: Mapped[str | None] = mapped_column(String(100))
+    battery_included: Mapped[bool] = mapped_column(Boolean, default=False)
+    annual_production_kwh: Mapped[float | None] = mapped_column(Float)
+
+    # Status & dates
+    status: Mapped[DealStatus] = mapped_column(
+        Enum(DealStatus), default=DealStatus.pending_contract
+    )
+    sale_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    install_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    pto_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    # Customer info snapshot
+    customer_name: Mapped[str] = mapped_column(String(200), nullable=False)
+    customer_address: Mapped[str | None] = mapped_column(String(500))
+    customer_phone: Mapped[str | None] = mapped_column(String(20))
+    customer_email: Mapped[str | None] = mapped_column(String(255))
+
+    notes: Mapped[str | None] = mapped_column(Text)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+    # Relationships
+    lead: Mapped["Lead"] = relationship()
+    rep: Mapped["RepUser"] = relationship()
+
+    __table_args__ = (
+        Index("ix_sale_lead_id", "lead_id"),
+        Index("ix_sale_rep_id", "rep_id"),
+        Index("ix_sale_status", "status"),
+        Index("ix_sale_date", "sale_date"),
+    )
