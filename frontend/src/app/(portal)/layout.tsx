@@ -90,8 +90,18 @@ export default function PortalLayout({
             </div>
           </div>
           <div className="mt-8 border-t border-solar-800 pt-6 text-center text-sm text-gray-400">
-            &copy; {new Date().getFullYear()} Solar Command. All rights
-            reserved. Powered by Sunburst Solar.
+            <p>
+              &copy; {new Date().getFullYear()} Solar Command. All rights
+              reserved. Powered by Sunburst Solar.
+            </p>
+            <p className="mt-2">
+              <Link
+                href="/privacy-policy"
+                className="hover:text-white transition-colors"
+              >
+                Privacy Policy
+              </Link>
+            </p>
           </div>
         </div>
       </footer>
