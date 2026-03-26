@@ -85,11 +85,13 @@ export default function DiscoveryPage() {
     fetchLeads();
   }, [fetchLeads]);
 
+  const [skipTraceLimit, setSkipTraceLimit] = useState(250);
+
   async function handleSkipTrace() {
     setEnriching(true);
     setEnrichMsg("");
     try {
-      const res = await leadgenApi.skipTrace(50, {
+      const res = await leadgenApi.skipTrace(skipTraceLimit, {
         county: county || undefined,
         min_score: minScore > 0 ? minScore : undefined,
       });
@@ -223,13 +225,26 @@ export default function DiscoveryPage() {
               </div>
             )}
           </div>
-          <button
-            onClick={handleSkipTrace}
-            disabled={enriching || pipelining}
-            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-          >
-            {enriching ? "Processing..." : "Skip Trace Top 50"}
-          </button>
+          <div className="flex items-center">
+            <select
+              value={skipTraceLimit}
+              onChange={(e) => setSkipTraceLimit(Number(e.target.value))}
+              className="rounded-l-lg border border-r-0 border-gray-300 bg-white px-2 py-2 text-sm text-gray-700 focus:ring-2 focus:ring-solar-500 outline-none"
+            >
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+              <option value={250}>250</option>
+              <option value={500}>500</option>
+              <option value={1000}>1,000</option>
+            </select>
+            <button
+              onClick={handleSkipTrace}
+              disabled={enriching || pipelining}
+              className="rounded-r-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            >
+              {enriching ? "Processing..." : "Skip Trace"}
+            </button>
+          </div>
           <div className="relative">
             <button
               onClick={() => setShowSmsPicker(!showSmsPicker)}
