@@ -18,6 +18,8 @@ from app.core.config import get_settings
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.enrichment.pipeline import enrich_lead, skip_trace_leads, validate_contact
+from app.services.email import send_skip_trace_notification as send_skip_trace_email
+from app.services.sms import send_skip_trace_notification as send_skip_trace_sms
 from app.models.schema import (
     ContactChannel,
     ContactEnrichment,
@@ -772,6 +774,21 @@ async def skip_trace_discovered(
         activated = await _auto_activate_traced_leads(db, lead_ids)
 
     await db.commit()
+
+    # Notify owner via SMS + email
+    await send_skip_trace_sms(
+        submitted=trace_result.get("submitted", 0),
+        found=trace_result.get("found", 0),
+        not_found=trace_result.get("not_found", 0),
+        activated=activated,
+    )
+    await send_skip_trace_email(
+        submitted=trace_result.get("submitted", 0),
+        found=trace_result.get("found", 0),
+        not_found=trace_result.get("not_found", 0),
+        activated=activated,
+    )
+
     return {"status": "completed", **trace_result, "activated": activated}
 
 
@@ -930,6 +947,21 @@ async def run_full_pipeline(
         payload.county, discovery_result["ingested"], discovery_result["scored"],
         traced, phones_found, activated, sms_queued,
     )
+
+    # Notify owner via SMS + email
+    if traced > 0:
+        await send_skip_trace_sms(
+            submitted=traced,
+            found=phones_found,
+            not_found=traced - phones_found,
+            activated=activated,
+        )
+        await send_skip_trace_email(
+            submitted=traced,
+            found=phones_found,
+            not_found=traced - phones_found,
+            activated=activated,
+        )
 
     return FullPipelineResponse(
         status="completed",

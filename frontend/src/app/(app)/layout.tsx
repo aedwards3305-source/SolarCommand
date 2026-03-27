@@ -29,9 +29,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   if (!user && !hasToken) return null;
 
   return (
-    <div className="flex min-h-screen">
+    <div className="min-h-screen">
       <Sidebar />
-      <main className="ml-64 flex-1 p-6">{children}</main>
+      <main className="min-w-0 p-4 pt-16 md:ml-64 md:p-6 md:pt-6">{children}</main>
     </div>
   );
 }

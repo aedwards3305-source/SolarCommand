@@ -28,8 +28,9 @@ class Settings(BaseSettings):
     sendgrid_api_key: str = ""
     sendgrid_from_email: str = "solar@example.com"
 
-    # Email notifications — where new lead alerts are sent
+    # Notifications — where alerts are sent (email + SMS to owner)
     notification_email: str = ""
+    notification_phone: str = ""  # Owner phone for SMS alerts (E.164 format)
 
     # AI Provider — Anthropic Claude (primary)
     anthropic_api_key: str = ""

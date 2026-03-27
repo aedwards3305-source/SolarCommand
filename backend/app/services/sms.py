@@ -116,6 +116,31 @@ def followup_1_sms(first_name: str) -> str:
     )
 
 
+def skip_trace_summary_sms(submitted: int, found: int, activated: int) -> str:
+    """SMS sent to owner after a skip-trace batch completes."""
+    return (
+        f"Skip-trace complete: {submitted} submitted, "
+        f"{found} contacts found, {activated} auto-activated. "
+        f"— Solar Command CRM"
+    )
+
+
+async def send_skip_trace_notification(
+    submitted: int, found: int, not_found: int, activated: int,
+) -> dict | None:
+    """Send an SMS to the owner summarizing skip-trace results.
+
+    Returns the Twilio response dict, or None if notifications aren't configured.
+    """
+    settings = get_settings()
+    if not settings.notification_phone:
+        logger.info("NOTIFICATION_PHONE not set — skipping skip-trace SMS alert")
+        return None
+
+    body = skip_trace_summary_sms(submitted, found, activated)
+    return await send_sms_async(settings.notification_phone, body)
+
+
 def followup_2_sms(first_name: str) -> str:
     """Follow-up SMS #2 — sent ~72 hours after initial outreach with no response."""
     return (
