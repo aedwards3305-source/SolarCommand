@@ -17,6 +17,18 @@ interface QAItem {
   created_at: string;
 }
 
+function ScoreRing({ score }: { score: number }) {
+  const color =
+    score >= 80 ? "text-emerald-600" : score >= 60 ? "text-amber-500" : "text-red-500";
+  const bg =
+    score >= 80 ? "bg-emerald-50" : score >= 60 ? "bg-amber-50" : "bg-red-50";
+  return (
+    <span className={cn("inline-flex items-center justify-center h-9 w-9 rounded-full text-sm font-bold tabular-nums", bg, color)}>
+      {score}
+    </span>
+  );
+}
+
 export default function QAQueuePage() {
   const [items, setItems] = useState<QAItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,115 +54,134 @@ export default function QAQueuePage() {
     fetchQueue();
   }, [fetchQueue]);
 
-  const scoreColor = (score: number) => {
-    if (score >= 80) return "text-green-700";
-    if (score >= 60) return "text-yellow-700";
-    return "text-red-700";
-  };
-
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">QA Review Queue</h1>
-        <label className="flex items-center gap-2 text-sm text-gray-600">
+      {/* Toolbar */}
+      <div className="admin-toolbar">
+        <label className="flex items-center gap-2 text-sm text-gray-500 cursor-pointer select-none">
           <input
             type="checkbox"
             checked={flaggedOnly}
             onChange={(e) => { setFlaggedOnly(e.target.checked); setPage(1); }}
-            className="rounded border-gray-300"
+            className="rounded border-gray-300 text-solar-600 focus:ring-solar-500"
           />
           Flagged only
         </label>
+        <span className="ml-auto text-xs font-medium text-gray-400">
+          Page {page}
+        </span>
       </div>
 
       {error && (
         <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">{error}</div>
       )}
 
-      <div className="overflow-x-auto rounded-xl bg-white shadow-sm border border-gray-200">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Lead</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Score</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Status</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Flags</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Reviewer</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Date</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {loading ? (
-              <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">Loading...</td></tr>
-            ) : items.length === 0 ? (
-              <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">No QA reviews found</td></tr>
-            ) : (
-              items.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">
-                    <Link href={`/leads/${item.lead_id}/qa`} className="font-medium text-solar-600 hover:text-solar-800">
-                      {item.lead_name}
-                    </Link>
+      <div className="admin-card">
+        <div className="overflow-x-auto">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Lead</th>
+                <th>Score</th>
+                <th>Status</th>
+                <th>Flags</th>
+                <th>Reviewer</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center">
+                    <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-gray-200 border-t-solar-500" />
+                    <p className="mt-3 text-sm text-gray-400">Loading...</p>
                   </td>
-                  <td className="px-4 py-3">
-                    <span className={cn("text-lg font-bold", scoreColor(item.compliance_score))}>
-                      {item.compliance_score}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={cn(
-                      "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
-                      item.checklist_pass ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                    )}>
-                      {item.checklist_pass ? "PASS" : "FAIL"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    {item.flags && item.flags.length > 0 ? (
-                      <div className="flex flex-wrap gap-1">
-                        {item.flags.slice(0, 3).map((f, i) => (
-                          <span key={i} className={cn(
-                            "inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium",
-                            f.severity === "critical" ? "bg-red-100 text-red-700" :
-                            f.severity === "warning" ? "bg-yellow-100 text-yellow-700" :
-                            "bg-blue-100 text-blue-700"
-                          )}>
-                            {f.flag.slice(0, 25)}
-                          </span>
-                        ))}
-                        {item.flags.length > 3 && (
-                          <span className="text-xs text-gray-400">+{item.flags.length - 3}</span>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-xs text-gray-400">None</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{item.reviewed_by}</td>
-                  <td className="px-4 py-3 text-xs text-gray-500">{formatDateTime(item.created_at)}</td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : items.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center text-gray-400 text-sm">No QA reviews found</td>
+                </tr>
+              ) : (
+                items.map((item) => (
+                  <tr key={item.id}>
+                    <td>
+                      <Link
+                        href={`/leads/${item.lead_id}/qa`}
+                        className="font-medium text-solar-600 hover:text-solar-800 transition-colors"
+                      >
+                        {item.lead_name}
+                      </Link>
+                    </td>
+                    <td>
+                      <ScoreRing score={item.compliance_score} />
+                    </td>
+                    <td>
+                      <span
+                        className={cn(
+                          "admin-badge",
+                          item.checklist_pass
+                            ? "bg-emerald-50 text-emerald-700"
+                            : "bg-red-50 text-red-700"
+                        )}
+                      >
+                        {item.checklist_pass ? "PASS" : "FAIL"}
+                      </span>
+                    </td>
+                    <td>
+                      {item.flags && item.flags.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {item.flags.slice(0, 3).map((f, i) => (
+                            <span
+                              key={i}
+                              className={cn(
+                                "inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium ring-1 ring-inset",
+                                f.severity === "critical"
+                                  ? "bg-red-50 text-red-600 ring-red-500/20"
+                                  : f.severity === "warning"
+                                  ? "bg-amber-50 text-amber-600 ring-amber-500/20"
+                                  : "bg-blue-50 text-blue-600 ring-blue-500/20"
+                              )}
+                            >
+                              {f.flag.slice(0, 25)}
+                            </span>
+                          ))}
+                          {item.flags.length > 3 && (
+                            <span className="text-[11px] text-gray-400 self-center">+{item.flags.length - 3}</span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-300">None</span>
+                      )}
+                    </td>
+                    <td className="text-sm text-gray-500">{item.reviewed_by}</td>
+                    <td className="text-xs text-gray-400 tabular-nums">{formatDateTime(item.created_at)}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        <button
-          onClick={() => setPage(Math.max(1, page - 1))}
-          disabled={page === 1}
-          className="rounded-lg border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50 disabled:opacity-50"
-        >
-          Previous
-        </button>
-        <span className="text-sm text-gray-500">Page {page}</span>
-        <button
-          onClick={() => setPage(page + 1)}
-          disabled={items.length < 50}
-          className="rounded-lg border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50 disabled:opacity-50"
-        >
-          Next
-        </button>
+      {/* Pagination */}
+      <div className="admin-pagination">
+        <span className="text-xs text-gray-400">Page {page}</span>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setPage(Math.max(1, page - 1))}
+            disabled={page === 1}
+            className="admin-page-btn"
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => setPage(page + 1)}
+            disabled={items.length < 50}
+            className="admin-page-btn"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

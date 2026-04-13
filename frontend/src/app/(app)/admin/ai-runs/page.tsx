@@ -30,14 +30,21 @@ interface AIStats {
 }
 
 const taskTypeColors: Record<string, string> = {
-  sms_classification: "bg-blue-100 text-blue-800",
-  qa_review: "bg-green-100 text-green-800",
-  objection_tags: "bg-amber-100 text-amber-800",
-  nba: "bg-purple-100 text-purple-800",
-  rep_brief: "bg-indigo-100 text-indigo-800",
-  script_suggest: "bg-pink-100 text-pink-800",
-  weekly_insights: "bg-cyan-100 text-cyan-800",
-  memory_update: "bg-gray-100 text-gray-800",
+  sms_classification: "bg-blue-50 text-blue-700 ring-blue-600/10",
+  qa_review: "bg-emerald-50 text-emerald-700 ring-emerald-600/10",
+  objection_tags: "bg-amber-50 text-amber-700 ring-amber-600/10",
+  nba: "bg-violet-50 text-violet-700 ring-violet-600/10",
+  rep_brief: "bg-indigo-50 text-indigo-700 ring-indigo-600/10",
+  script_suggest: "bg-pink-50 text-pink-700 ring-pink-600/10",
+  weekly_insights: "bg-cyan-50 text-cyan-700 ring-cyan-600/10",
+  memory_update: "bg-gray-50 text-gray-700 ring-gray-600/10",
+};
+
+const kpiAccents = {
+  runs: "border-l-solar-500",
+  errors: "border-l-red-400",
+  latency: "border-l-amber-400",
+  cost: "border-l-emerald-400",
 };
 
 export default function AIRunsPage() {
@@ -56,10 +63,7 @@ export default function AIRunsPage() {
     if (filter) params.task_type = filter;
     if (statusFilter) params.status = statusFilter;
 
-    Promise.all([
-      api.getAIRuns(params),
-      api.getAIStats(),
-    ])
+    Promise.all([api.getAIRuns(params), api.getAIStats()])
       .then(([runsData, statsData]) => {
         setRuns(runsData.runs);
         setTotal(runsData.total);
@@ -86,52 +90,53 @@ export default function AIRunsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">AI Operator Runs</h1>
-
-      {/* Stats Cards */}
+      {/* KPI Cards */}
       {stats && (
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <div className="rounded-xl bg-white p-4 shadow-sm border border-gray-200">
-            <p className="text-sm text-gray-500">Runs Today</p>
-            <p className="text-2xl font-bold text-gray-900">{stats.total_runs_today}</p>
+          <div className={cn("admin-kpi", kpiAccents.runs)}>
+            <p className="admin-kpi-label">Runs Today</p>
+            <p className="admin-kpi-value">{stats.total_runs_today}</p>
           </div>
-          <div className="rounded-xl bg-white p-4 shadow-sm border border-gray-200">
-            <p className="text-sm text-gray-500">Errors</p>
-            <p className={cn("text-2xl font-bold", stats.errors_today > 0 ? "text-red-600" : "text-green-600")}>
+          <div className={cn("admin-kpi", kpiAccents.errors)}>
+            <p className="admin-kpi-label">Errors</p>
+            <p className={cn("admin-kpi-value", stats.errors_today > 0 ? "text-red-600" : "text-emerald-600")}>
               {stats.errors_today}
             </p>
           </div>
-          <div className="rounded-xl bg-white p-4 shadow-sm border border-gray-200">
-            <p className="text-sm text-gray-500">Avg Latency</p>
-            <p className="text-2xl font-bold text-gray-900">{stats.avg_latency_ms}ms</p>
+          <div className={cn("admin-kpi", kpiAccents.latency)}>
+            <p className="admin-kpi-label">Avg Latency</p>
+            <p className="admin-kpi-value">{stats.avg_latency_ms}<span className="text-sm font-normal text-gray-400 ml-0.5">ms</span></p>
           </div>
-          <div className="rounded-xl bg-white p-4 shadow-sm border border-gray-200">
-            <p className="text-sm text-gray-500">Cost Today</p>
-            <p className="text-2xl font-bold text-gray-900">${stats.total_cost_today.toFixed(4)}</p>
+          <div className={cn("admin-kpi", kpiAccents.cost)}>
+            <p className="admin-kpi-label">Cost Today</p>
+            <p className="admin-kpi-value">${stats.total_cost_today.toFixed(4)}</p>
           </div>
         </div>
       )}
 
-      {/* Task breakdown */}
+      {/* Task breakdown pills */}
       {stats && Object.keys(stats.runs_by_task).length > 0 && (
         <div className="flex flex-wrap gap-2">
           {Object.entries(stats.runs_by_task).map(([task, count]) => (
             <span
               key={task}
-              className={cn("inline-flex items-center rounded-full px-3 py-1 text-xs font-medium", taskTypeColors[task] || "bg-gray-100 text-gray-800")}
+              className={cn(
+                "admin-badge ring-1 ring-inset",
+                taskTypeColors[task] || "bg-gray-50 text-gray-700 ring-gray-600/10"
+              )}
             >
-              {task}: {count}
+              {task.replace(/_/g, " ")}: {count}
             </span>
           ))}
         </div>
       )}
 
       {/* Filters */}
-      <div className="flex gap-3">
+      <div className="admin-toolbar">
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+          className="admin-select"
         >
           <option value="">All task types</option>
           <option value="sms_classification">SMS Classification</option>
@@ -146,14 +151,16 @@ export default function AIRunsPage() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+          className="admin-select"
         >
           <option value="">All statuses</option>
           <option value="success">Success</option>
           <option value="error">Error</option>
           <option value="pending">Pending</option>
         </select>
-        <span className="self-center text-sm text-gray-500">{total} total runs</span>
+        <span className="ml-auto text-xs font-medium text-gray-400 tabular-nums">
+          {total} total runs
+        </span>
       </div>
 
       {error && (
@@ -163,76 +170,99 @@ export default function AIRunsPage() {
       )}
 
       {loading ? (
-        <div className="animate-pulse text-gray-400">Loading AI runs...</div>
+        <div className="admin-card p-12 text-center">
+          <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-gray-200 border-t-solar-500" />
+          <p className="mt-3 text-sm text-gray-400">Loading AI runs...</p>
+        </div>
       ) : runs.length === 0 ? (
-        <div className="text-gray-400">No AI runs found</div>
+        <div className="admin-card p-12 text-center text-gray-400 text-sm">
+          No AI runs found
+        </div>
       ) : (
         <div className="space-y-2">
           {runs.map((run) => (
-            <div key={run.id} className="rounded-xl bg-white shadow-sm border border-gray-200 overflow-hidden">
+            <div key={run.id} className="admin-card">
               <button
                 onClick={() => handleExpand(run.id)}
-                className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors text-left"
+                className="w-full flex items-center justify-between p-4 hover:bg-gray-50/70 transition-colors text-left"
               >
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <span className="text-xs font-mono text-gray-400">#{run.id}</span>
-                  <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", taskTypeColors[run.task_type] || "bg-gray-100 text-gray-800")}>
-                    {run.task_type}
+                  <span className="text-[11px] font-mono text-gray-300 tabular-nums">#{run.id}</span>
+                  <span
+                    className={cn(
+                      "admin-badge ring-1 ring-inset",
+                      taskTypeColors[run.task_type] || "bg-gray-50 text-gray-700 ring-gray-600/10"
+                    )}
+                  >
+                    {run.task_type.replace(/_/g, " ")}
                   </span>
-                  <span className="text-sm text-gray-600 truncate">
-                    {run.model}
-                  </span>
+                  <span className="text-xs text-gray-500 truncate">{run.model}</span>
                   {run.lead_id && (
-                    <span className="text-xs text-gray-500">Lead #{run.lead_id}</span>
+                    <span className="text-[11px] text-gray-400">Lead #{run.lead_id}</span>
                   )}
                 </div>
                 <div className="flex items-center gap-4 flex-shrink-0">
                   {run.latency_ms != null && (
-                    <span className="text-xs text-gray-500">{run.latency_ms}ms</span>
+                    <span className="text-[11px] tabular-nums text-gray-400">{run.latency_ms}ms</span>
                   )}
-                  <span className="text-xs text-gray-500">
+                  <span className="text-[11px] tabular-nums text-gray-400">
                     {run.tokens_in + run.tokens_out} tok
                   </span>
                   {run.cost_usd != null && run.cost_usd > 0 && (
-                    <span className="text-xs text-gray-500">${run.cost_usd.toFixed(4)}</span>
+                    <span className="text-[11px] tabular-nums text-gray-400">${run.cost_usd.toFixed(4)}</span>
                   )}
-                  <span className={cn(
-                    "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
-                    run.status === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                  )}>
+                  <span
+                    className={cn(
+                      "admin-badge",
+                      run.status === "success"
+                        ? "bg-emerald-50 text-emerald-700"
+                        : "bg-red-50 text-red-700"
+                    )}
+                  >
                     {run.status}
                   </span>
-                  <span className="text-xs text-gray-500">{formatDateTime(run.created_at)}</span>
+                  <span className="text-[11px] text-gray-400">{formatDateTime(run.created_at)}</span>
+                  <svg
+                    className={cn("h-4 w-4 text-gray-300 transition-transform", expanded === run.id && "rotate-180")}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
                 </div>
               </button>
               {expanded === run.id && detail && (
-                <div className="border-t border-gray-200 p-4 bg-gray-50">
-                  <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+                <div className="border-t border-gray-100 p-5 bg-gray-50/50">
+                  <div className="grid grid-cols-2 gap-4 text-sm mb-4 lg:grid-cols-4">
                     <div>
-                      <span className="text-gray-500">Model:</span>{" "}
-                      <span className="font-medium">{(detail as Record<string, unknown>).model as string}</span>
+                      <span className="admin-kpi-label">Model</span>
+                      <p className="mt-0.5 font-medium text-gray-900">{String((detail as Record<string, unknown>).model)}</p>
                     </div>
                     <div>
-                      <span className="text-gray-500">Temperature:</span>{" "}
-                      <span className="font-medium">{String((detail as Record<string, unknown>).temperature)}</span>
+                      <span className="admin-kpi-label">Temperature</span>
+                      <p className="mt-0.5 font-medium text-gray-900">{String((detail as Record<string, unknown>).temperature)}</p>
                     </div>
                     <div>
-                      <span className="text-gray-500">Prompt Version:</span>{" "}
-                      <span className="font-medium">{String((detail as Record<string, unknown>).prompt_version)}</span>
+                      <span className="admin-kpi-label">Prompt Version</span>
+                      <p className="mt-0.5 font-medium text-gray-900">{String((detail as Record<string, unknown>).prompt_version)}</p>
                     </div>
                     <div>
-                      <span className="text-gray-500">Tokens:</span>{" "}
-                      <span className="font-medium">{String((detail as Record<string, unknown>).tokens_in)} in / {String((detail as Record<string, unknown>).tokens_out)} out</span>
+                      <span className="admin-kpi-label">Tokens</span>
+                      <p className="mt-0.5 font-medium text-gray-900 tabular-nums">
+                        {String((detail as Record<string, unknown>).tokens_in)} in / {String((detail as Record<string, unknown>).tokens_out)} out
+                      </p>
                     </div>
                   </div>
                   {!!(detail as Record<string, unknown>).error && (
-                    <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+                    <div className="mb-4 rounded-lg bg-red-50 border border-red-100 p-3 text-sm text-red-700">
                       {String((detail as Record<string, unknown>).error)}
                     </div>
                   )}
                   <div>
-                    <p className="text-xs font-semibold text-gray-500 mb-1">Output JSON</p>
-                    <pre className="whitespace-pre-wrap text-xs text-gray-700 font-mono bg-white rounded-lg p-3 border border-gray-200 max-h-64 overflow-y-auto">
+                    <p className="admin-kpi-label mb-2">Output JSON</p>
+                    <pre className="whitespace-pre-wrap text-xs text-gray-600 font-mono bg-white rounded-lg p-4 border border-gray-100 max-h-64 overflow-y-auto leading-relaxed">
                       {JSON.stringify((detail as Record<string, unknown>).output_json, null, 2)}
                     </pre>
                   </div>

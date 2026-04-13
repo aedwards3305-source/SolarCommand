@@ -53,7 +53,6 @@ export default function CostCenterPage() {
   const [category, setCategory] = useState("all");
   const [page, setPage] = useState(0);
 
-  // Reset page when filters change
   useEffect(() => {
     setPage(0);
   }, [month, category]);
@@ -87,18 +86,12 @@ export default function CostCenterPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Cost Center</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Monthly breakdown of AI and voice call costs
-          </p>
-        </div>
+      {/* Month selector */}
+      <div className="flex justify-end">
         <select
           value={month}
           onChange={(e) => setMonth(e.target.value)}
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-solar-500 outline-none"
+          className="admin-select"
         >
           {getMonthOptions().map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -116,33 +109,33 @@ export default function CostCenterPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div className="rounded-xl bg-white p-4 shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-500">Total Cost</p>
-          <p className="mt-1 text-2xl font-bold text-gray-900">
+        <div className="admin-kpi border-l-gray-800">
+          <p className="admin-kpi-label">Total Cost</p>
+          <p className="admin-kpi-value">
             {summary ? formatCostUsd(summary.total_cost) : "—"}
           </p>
         </div>
-        <div className="rounded-xl bg-white p-4 shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-500">AI Cost</p>
-          <p className="mt-1 text-2xl font-bold text-indigo-600">
+        <div className="admin-kpi border-l-indigo-400">
+          <p className="admin-kpi-label">AI Cost</p>
+          <p className="admin-kpi-value text-indigo-600">
             {summary ? formatCostUsd(summary.ai_cost) : "—"}
           </p>
-          <p className="text-xs text-gray-400 mt-0.5">
+          <p className="admin-kpi-sub">
             {summary ? `${summary.ai_run_count.toLocaleString()} runs` : ""}
           </p>
         </div>
-        <div className="rounded-xl bg-white p-4 shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-500">Voice Cost</p>
-          <p className="mt-1 text-2xl font-bold text-green-600">
+        <div className="admin-kpi border-l-emerald-400">
+          <p className="admin-kpi-label">Voice Cost</p>
+          <p className="admin-kpi-value text-emerald-600">
             {summary ? formatCostUsd(summary.voice_cost) : "—"}
           </p>
-          <p className="text-xs text-gray-400 mt-0.5">
+          <p className="admin-kpi-sub">
             {summary ? `${summary.voice_call_count.toLocaleString()} calls` : ""}
           </p>
         </div>
-        <div className="rounded-xl bg-white p-4 shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-500">Transactions</p>
-          <p className="mt-1 text-2xl font-bold text-gray-900">
+        <div className="admin-kpi border-l-sunburst-400">
+          <p className="admin-kpi-label">Transactions</p>
+          <p className="admin-kpi-value">
             {summary
               ? (summary.ai_run_count + summary.voice_call_count).toLocaleString()
               : "—"}
@@ -150,10 +143,10 @@ export default function CostCenterPage() {
         </div>
       </div>
 
-      {/* Daily Spending Chart — pixel-based bars */}
+      {/* Daily Spending Chart */}
       {summary && summary.daily_totals.length > 0 && (
-        <div className="rounded-xl bg-white p-6 shadow-sm border border-gray-200">
-          <h3 className="text-sm font-semibold text-gray-700 mb-4">Daily Spending</h3>
+        <div className="admin-card p-6">
+          <h3 className="admin-kpi-label mb-4">Daily Spending</h3>
           <div
             className="flex items-end gap-[2px]"
             style={{ height: `${CHART_H}px` }}
@@ -173,27 +166,25 @@ export default function CostCenterPage() {
                   className="flex-1 relative group"
                   style={{ height: `${CHART_H}px` }}
                 >
-                  {/* Bar anchored to bottom */}
                   <div
                     className="absolute bottom-0 left-0 right-0 flex flex-col rounded-t-sm overflow-hidden"
                     style={{ height: `${barH}px` }}
                   >
                     {aiH > 0 && (
                       <div
-                        className="w-full bg-indigo-400"
+                        className="w-full bg-indigo-400/80"
                         style={{ height: `${aiH}px` }}
                       />
                     )}
                     {voiceH > 0 && (
                       <div
-                        className="w-full bg-green-400"
+                        className="w-full bg-emerald-400/80"
                         style={{ height: `${voiceH}px` }}
                       />
                     )}
                   </div>
-                  {/* Hover tooltip */}
                   {dayTotal > 0 && (
-                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 hidden group-hover:block bg-gray-900 text-white text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap z-10 pointer-events-none">
+                    <div className="absolute -top-7 left-1/2 -translate-x-1/2 hidden group-hover:block bg-gray-900 text-white text-[10px] px-2 py-1 rounded-md whitespace-nowrap z-10 pointer-events-none shadow-lg">
                       {formatCostUsd(dayTotal)}
                     </div>
                   )}
@@ -203,17 +194,15 @@ export default function CostCenterPage() {
           </div>
           <div className="flex justify-between mt-2 text-[10px] text-gray-400">
             <span>{summary.daily_totals[0]?.date.slice(5)}</span>
-            <span>
-              {summary.daily_totals[summary.daily_totals.length - 1]?.date.slice(5)}
-            </span>
+            <span>{summary.daily_totals[summary.daily_totals.length - 1]?.date.slice(5)}</span>
           </div>
           <div className="flex gap-4 mt-3 text-xs text-gray-500">
             <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-indigo-400" />
+              <span className="h-2 w-2 rounded-full bg-indigo-400" />
               AI
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
+              <span className="h-2 w-2 rounded-full bg-emerald-400" />
               Voice
             </span>
           </div>
@@ -222,106 +211,103 @@ export default function CostCenterPage() {
 
       {/* Category Filter + Items Table */}
       <div className="space-y-4">
-        <div className="flex items-center gap-2">
+        <div className="admin-toolbar">
           {(["all", "ai", "voice"] as const).map((cat) => (
             <button
               key={cat}
               onClick={() => setCategory(cat)}
-              className={cn(
-                "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
-                category === cat
-                  ? "bg-gray-900 text-white"
-                  : "bg-white text-gray-600 border border-gray-300 hover:bg-gray-50"
-              )}
+              className={category === cat ? "admin-btn-active" : "admin-btn"}
             >
               {cat === "all" ? "All" : cat === "ai" ? "AI" : "Voice"}
             </button>
           ))}
-          <span className="text-sm text-gray-500 ml-2">
+          <span className="ml-auto text-xs font-medium text-gray-400 tabular-nums">
             {total.toLocaleString()} item{total !== 1 ? "s" : ""}
           </span>
         </div>
 
-        <div className="rounded-xl bg-white shadow-sm border border-gray-200 overflow-hidden">
+        <div className="admin-card">
           {loading ? (
-            <div className="p-8 text-center text-gray-400 animate-pulse">
-              Loading cost data...
+            <div className="p-12 text-center">
+              <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-gray-200 border-t-solar-500" />
+              <p className="mt-3 text-sm text-gray-400">Loading cost data...</p>
             </div>
           ) : items.length === 0 ? (
-            <div className="p-8 text-center text-gray-400">
+            <div className="p-12 text-center text-gray-400 text-sm">
               No cost items for this period
             </div>
           ) : (
-            <table className="min-w-full text-sm">
-              <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
-                <tr>
-                  <th className="px-4 py-3 text-left">Time</th>
-                  <th className="px-4 py-3 text-left">Category</th>
-                  <th className="px-4 py-3 text-left">Description</th>
-                  <th className="px-4 py-3 text-left">Lead</th>
-                  <th className="px-4 py-3 text-right">Cost</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {items.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
-                      {formatDateTime(item.timestamp)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={cn(
-                          "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
-                          item.category === "ai"
-                            ? "bg-indigo-100 text-indigo-800"
-                            : "bg-green-100 text-green-800"
-                        )}
-                      >
-                        {item.category === "ai" ? "AI" : "Voice"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="text-gray-900">{item.description}</div>
-                      <div className="text-xs text-gray-500">{item.detail}</div>
-                    </td>
-                    <td className="px-4 py-3 text-gray-500">
-                      {item.lead_id ? `#${item.lead_id}` : "—"}
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono text-gray-900">
-                      {formatCostUsd(item.cost_usd)}
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Lead</th>
+                    <th className="text-right">Cost</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-
-          {/* Pagination footer */}
-          {!loading && total > 0 && (
-            <div className="border-t border-gray-200 bg-gray-50 px-4 py-3 flex items-center justify-between text-sm">
-              <span className="text-gray-500">
-                Showing {page * 50 + 1}–{Math.min((page + 1) * 50, total)} of{" "}
-                {total.toLocaleString()}
-              </span>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setPage((p) => Math.max(0, p - 1))}
-                  disabled={page === 0}
-                  className="rounded border border-gray-300 bg-white px-3 py-1 text-gray-700 hover:bg-gray-50 disabled:opacity-40"
-                >
-                  Prev
-                </button>
-                <button
-                  onClick={() => setPage((p) => p + 1)}
-                  disabled={!hasMore}
-                  className="rounded border border-gray-300 bg-white px-3 py-1 text-gray-700 hover:bg-gray-50 disabled:opacity-40"
-                >
-                  Next
-                </button>
-              </div>
+                </thead>
+                <tbody>
+                  {items.map((item) => (
+                    <tr key={item.id}>
+                      <td className="text-gray-400 whitespace-nowrap text-xs tabular-nums">
+                        {formatDateTime(item.timestamp)}
+                      </td>
+                      <td>
+                        <span
+                          className={cn(
+                            "admin-badge",
+                            item.category === "ai"
+                              ? "bg-indigo-50 text-indigo-700"
+                              : "bg-emerald-50 text-emerald-700"
+                          )}
+                        >
+                          {item.category === "ai" ? "AI" : "Voice"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="text-gray-900 text-sm">{item.description}</div>
+                        <div className="text-[11px] text-gray-400">{item.detail}</div>
+                      </td>
+                      <td className="text-gray-400 text-xs tabular-nums">
+                        {item.lead_id ? `#${item.lead_id}` : "—"}
+                      </td>
+                      <td className="text-right font-mono text-sm tabular-nums text-gray-900">
+                        {formatCostUsd(item.cost_usd)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
+
+        {/* Pagination */}
+        {!loading && total > 0 && (
+          <div className="admin-pagination">
+            <span className="text-xs text-gray-400 tabular-nums">
+              {page * 50 + 1}–{Math.min((page + 1) * 50, total)} of {total.toLocaleString()}
+            </span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                disabled={page === 0}
+                className="admin-page-btn"
+              >
+                Prev
+              </button>
+              <button
+                onClick={() => setPage((p) => p + 1)}
+                disabled={!hasMore}
+                className="admin-page-btn"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

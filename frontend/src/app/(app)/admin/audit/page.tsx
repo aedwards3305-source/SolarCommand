@@ -42,13 +42,12 @@ export default function AuditLogPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Audit Log</h1>
-
-      <div className="flex gap-3">
+      {/* Toolbar */}
+      <div className="admin-toolbar">
         <select
           value={entityFilter}
           onChange={(e) => { setEntityFilter(e.target.value); setPage(1); }}
-          className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-solar-500 outline-none"
+          className="admin-select"
         >
           <option value="">All Entities</option>
           <option value="lead">Lead</option>
@@ -56,6 +55,9 @@ export default function AuditLogPage() {
           <option value="outreach_attempt">Outreach</option>
           <option value="consent_log">Consent</option>
         </select>
+        <span className="ml-auto text-xs font-medium text-gray-400">
+          Page {page}
+        </span>
       </div>
 
       {error && (
@@ -64,68 +66,80 @@ export default function AuditLogPage() {
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-xl bg-white shadow-sm border border-gray-200">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Time</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Actor</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Action</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Entity</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Old Value</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">New Value</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {loading ? (
+      <div className="admin-card">
+        <div className="overflow-x-auto">
+          <table className="admin-table">
+            <thead>
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-400">Loading...</td>
+                <th>Time</th>
+                <th>Actor</th>
+                <th>Action</th>
+                <th>Entity</th>
+                <th>Old Value</th>
+                <th>New Value</th>
               </tr>
-            ) : entries.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-400">No audit entries</td>
-              </tr>
-            ) : (
-              entries.map((e) => (
-                <tr key={e.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">
-                    {formatDateTime(e.created_at)}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{e.actor}</td>
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">{e.action}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    {e.entity_type}
-                    {e.entity_id != null && ` #${e.entity_id}`}
-                  </td>
-                  <td className="px-4 py-3 text-xs text-gray-500 max-w-xs truncate">
-                    {e.old_value || "—"}
-                  </td>
-                  <td className="px-4 py-3 text-xs text-gray-500 max-w-xs truncate">
-                    {e.new_value || "—"}
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center">
+                    <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-gray-200 border-t-solar-500" />
+                    <p className="mt-3 text-sm text-gray-400">Loading...</p>
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : entries.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center text-gray-400 text-sm">
+                    No audit entries
+                  </td>
+                </tr>
+              ) : (
+                entries.map((e) => (
+                  <tr key={e.id}>
+                    <td className="text-xs text-gray-400 whitespace-nowrap tabular-nums">
+                      {formatDateTime(e.created_at)}
+                    </td>
+                    <td className="text-sm text-gray-600">{e.actor}</td>
+                    <td className="text-sm font-medium text-gray-900">{e.action}</td>
+                    <td className="text-sm text-gray-600">
+                      <span className="admin-badge bg-gray-50 text-gray-600">
+                        {e.entity_type}
+                        {e.entity_id != null && ` #${e.entity_id}`}
+                      </span>
+                    </td>
+                    <td className="text-xs text-gray-400 max-w-[200px] truncate font-mono">
+                      {e.old_value || "—"}
+                    </td>
+                    <td className="text-xs text-gray-400 max-w-[200px] truncate font-mono">
+                      {e.new_value || "—"}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        <button
-          onClick={() => setPage(Math.max(1, page - 1))}
-          disabled={page === 1}
-          className="rounded-lg border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50 disabled:opacity-50"
-        >
-          Previous
-        </button>
-        <span className="text-sm text-gray-500">Page {page}</span>
-        <button
-          onClick={() => setPage(page + 1)}
-          disabled={entries.length < 50}
-          className="rounded-lg border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50 disabled:opacity-50"
-        >
-          Next
-        </button>
+      {/* Pagination */}
+      <div className="admin-pagination">
+        <span className="text-xs text-gray-400">Page {page}</span>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setPage(Math.max(1, page - 1))}
+            disabled={page === 1}
+            className="admin-page-btn"
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => setPage(page + 1)}
+            disabled={entries.length < 50}
+            className="admin-page-btn"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

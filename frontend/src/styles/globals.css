@@ -8,3 +8,71 @@
     @apply bg-gray-50 text-gray-900 antialiased overflow-x-hidden;
   }
 }
+
+@layer components {
+  /* Admin KPI card with left accent border */
+  .admin-kpi {
+    @apply rounded-xl bg-white p-5 shadow-sm border border-gray-100 border-l-4 transition-shadow hover:shadow-md;
+  }
+  .admin-kpi-label {
+    @apply text-xs font-semibold uppercase tracking-wide text-gray-400;
+  }
+  .admin-kpi-value {
+    @apply mt-1.5 text-2xl font-bold tabular-nums text-gray-900;
+  }
+  .admin-kpi-sub {
+    @apply mt-0.5 text-xs text-gray-400;
+  }
+
+  /* Admin card wrapper */
+  .admin-card {
+    @apply rounded-xl bg-white shadow-sm border border-gray-100 overflow-hidden;
+  }
+
+  /* Admin table */
+  .admin-table {
+    @apply min-w-full text-sm;
+  }
+  .admin-table thead {
+    @apply border-b border-gray-200;
+  }
+  .admin-table th {
+    @apply px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-400 bg-gray-50/60;
+  }
+  .admin-table tbody {
+    @apply divide-y divide-gray-50;
+  }
+  .admin-table tbody tr {
+    @apply transition-colors hover:bg-gray-50/70;
+  }
+  .admin-table td {
+    @apply px-4 py-3;
+  }
+
+  /* Admin toolbar / filter bar */
+  .admin-toolbar {
+    @apply flex flex-wrap items-center gap-3 rounded-lg bg-white px-4 py-3 shadow-sm border border-gray-100;
+  }
+  .admin-select {
+    @apply rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 outline-none transition-colors focus:border-solar-400 focus:ring-2 focus:ring-solar-100;
+  }
+  .admin-btn {
+    @apply rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition-all hover:bg-gray-50 hover:border-gray-300 disabled:opacity-40;
+  }
+  .admin-btn-active {
+    @apply rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow-sm;
+  }
+
+  /* Admin pagination */
+  .admin-pagination {
+    @apply flex items-center justify-between rounded-lg bg-white px-4 py-3 shadow-sm border border-gray-100;
+  }
+  .admin-page-btn {
+    @apply rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed;
+  }
+
+  /* Admin badge */
+  .admin-badge {
+    @apply inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium;
+  }
+}
