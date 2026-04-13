@@ -49,12 +49,26 @@ export default function AppointmentsPage() {
 
   // Create modal state
   const [creating, setCreating] = useState(false);
-  const [newLeadId, setNewLeadId] = useState("");
+  const [newLeadId, setNewLeadId] = useState<number | null>(null);
+  const [newName, setNewName] = useState("");
+  const [newPhone, setNewPhone] = useState("");
+  const [newEmail, setNewEmail] = useState("");
   const [newStart, setNewStart] = useState("");
   const [newEnd, setNewEnd] = useState("");
   const [newNotes, setNewNotes] = useState("");
   const [createSaving, setCreateSaving] = useState(false);
   const [createError, setCreateError] = useState("");
+
+  // Lead search state
+  const [leadSearchResults, setLeadSearchResults] = useState<Array<{
+    id: number;
+    first_name: string | null;
+    last_name: string | null;
+    phone: string | null;
+    status: string;
+  }>>([]);
+  const [searchingLeads, setSearchingLeads] = useState(false);
+  const [showLeadDropdown, setShowLeadDropdown] = useState(false);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -110,21 +124,56 @@ export default function AppointmentsPage() {
     }
   }
 
+  // ── Lead search ──
+  async function searchLeads(query: string) {
+    if (query.length < 2) {
+      setLeadSearchResults([]);
+      setShowLeadDropdown(false);
+      return;
+    }
+    setSearchingLeads(true);
+    try {
+      const res = await api.getLeads({ page_size: "10" });
+      const q = query.toLowerCase();
+      const matches = res.leads.filter((l) => {
+        const fullName = `${l.first_name || ""} ${l.last_name || ""}`.toLowerCase();
+        const phone = (l.phone || "").toLowerCase();
+        return fullName.includes(q) || phone.includes(q);
+      });
+      setLeadSearchResults(matches);
+      setShowLeadDropdown(matches.length > 0);
+    } catch {
+      setLeadSearchResults([]);
+    } finally {
+      setSearchingLeads(false);
+    }
+  }
+
+  function selectLead(lead: { id: number; first_name: string | null; last_name: string | null; phone: string | null }) {
+    setNewLeadId(lead.id);
+    setNewName(`${lead.first_name || ""} ${lead.last_name || ""}`.trim());
+    setNewPhone(lead.phone || "");
+    setShowLeadDropdown(false);
+  }
+
   // ── Create handler ──
   async function handleCreate() {
-    if (!user) return;
+    if (!user || !newLeadId) return;
     setCreateSaving(true);
     setCreateError("");
     try {
       await api.createAppointment({
-        lead_id: parseInt(newLeadId),
+        lead_id: newLeadId,
         rep_id: user.id,
         scheduled_start: new Date(newStart).toISOString(),
         scheduled_end: new Date(newEnd).toISOString(),
         notes: newNotes || undefined,
       });
       setCreating(false);
-      setNewLeadId("");
+      setNewLeadId(null);
+      setNewName("");
+      setNewPhone("");
+      setNewEmail("");
       setNewStart("");
       setNewEnd("");
       setNewNotes("");
@@ -350,16 +399,74 @@ export default function AppointmentsPage() {
             </div>
           )}
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Lead ID</label>
+            <div className="relative">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
               <input
-                type="number"
-                value={newLeadId}
-                onChange={(e) => setNewLeadId(e.target.value)}
-                placeholder="Enter lead ID"
+                type="text"
+                value={newName}
+                onChange={(e) => {
+                  setNewName(e.target.value);
+                  setNewLeadId(null);
+                  searchLeads(e.target.value);
+                }}
+                onFocus={() => { if (leadSearchResults.length > 0) setShowLeadDropdown(true); }}
+                onBlur={() => { setTimeout(() => setShowLeadDropdown(false), 200); }}
+                placeholder="Search by name or phone"
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
               />
+              {searchingLeads && (
+                <div className="absolute right-3 top-8 text-xs text-gray-400">Searching...</div>
+              )}
+              {showLeadDropdown && leadSearchResults.length > 0 && (
+                <div className="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg max-h-48 overflow-y-auto">
+                  {leadSearchResults.map((lead) => (
+                    <button
+                      key={lead.id}
+                      type="button"
+                      onClick={() => selectLead(lead)}
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 border-b border-gray-100 last:border-0"
+                    >
+                      <span className="font-medium">{lead.first_name} {lead.last_name}</span>
+                      {lead.phone && <span className="ml-2 text-gray-500">{lead.phone}</span>}
+                      <span className="ml-2 text-xs text-gray-400">#{lead.id}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+              <input
+                type="tel"
+                value={newPhone}
+                onChange={(e) => {
+                  setNewPhone(e.target.value);
+                  if (!newName) {
+                    setNewLeadId(null);
+                    searchLeads(e.target.value);
+                  }
+                }}
+                placeholder="Phone number"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                readOnly={!!newLeadId}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input
+                type="email"
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                placeholder="Email address"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                readOnly={!!newLeadId}
+              />
+            </div>
+            {newLeadId && (
+              <div className="rounded-lg bg-green-50 border border-green-200 px-3 py-2 text-sm text-green-700">
+                Linked to Lead #{newLeadId}
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Start</label>
@@ -402,7 +509,7 @@ export default function AppointmentsPage() {
                 disabled={createSaving || !newLeadId || !newStart || !newEnd}
                 className={cn(
                   "rounded-lg px-4 py-2 text-sm font-medium text-white",
-                  createSaving || !newLeadId || !newStart || !newEnd ? "bg-gray-400" : "bg-solar-600 hover:bg-solar-700"
+                  createSaving || !newLeadId || !newStart || !newEnd ? "bg-gray-400 cursor-not-allowed" : "bg-solar-600 hover:bg-solar-700"
                 )}
               >
                 {createSaving ? "Creating..." : "Create Appointment"}
