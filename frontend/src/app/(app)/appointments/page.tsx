@@ -125,23 +125,23 @@ export default function AppointmentsPage() {
   }
 
   // ── Lead search ──
+  // Hits the backend `q` param so we search the full lead table, not just
+  // the 10 most-recent. Client-side filtering was causing "phantom save"
+  // bugs: if the lead wasn't in the top 10 the dropdown stayed empty, the
+  // Create button silently stayed disabled, and the rep thought they'd
+  // saved an appointment that never posted.
   async function searchLeads(query: string) {
-    if (query.length < 2) {
+    const trimmed = query.trim();
+    if (trimmed.length < 2) {
       setLeadSearchResults([]);
       setShowLeadDropdown(false);
       return;
     }
     setSearchingLeads(true);
     try {
-      const res = await api.getLeads({ page_size: "10" });
-      const q = query.toLowerCase();
-      const matches = res.leads.filter((l) => {
-        const fullName = `${l.first_name || ""} ${l.last_name || ""}`.toLowerCase();
-        const phone = (l.phone || "").toLowerCase();
-        return fullName.includes(q) || phone.includes(q);
-      });
-      setLeadSearchResults(matches);
-      setShowLeadDropdown(matches.length > 0);
+      const res = await api.getLeads({ q: trimmed, page_size: "20" });
+      setLeadSearchResults(res.leads);
+      setShowLeadDropdown(true);
     } catch {
       setLeadSearchResults([]);
     } finally {
@@ -417,20 +417,26 @@ export default function AppointmentsPage() {
               {searchingLeads && (
                 <div className="absolute right-3 top-8 text-xs text-gray-400">Searching...</div>
               )}
-              {showLeadDropdown && leadSearchResults.length > 0 && (
+              {showLeadDropdown && (
                 <div className="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg max-h-48 overflow-y-auto">
-                  {leadSearchResults.map((lead) => (
-                    <button
-                      key={lead.id}
-                      type="button"
-                      onClick={() => selectLead(lead)}
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 border-b border-gray-100 last:border-0"
-                    >
-                      <span className="font-medium">{lead.first_name} {lead.last_name}</span>
-                      {lead.phone && <span className="ml-2 text-gray-500">{lead.phone}</span>}
-                      <span className="ml-2 text-xs text-gray-400">#{lead.id}</span>
-                    </button>
-                  ))}
+                  {leadSearchResults.length > 0 ? (
+                    leadSearchResults.map((lead) => (
+                      <button
+                        key={lead.id}
+                        type="button"
+                        onClick={() => selectLead(lead)}
+                        className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 border-b border-gray-100 last:border-0"
+                      >
+                        <span className="font-medium">{lead.first_name} {lead.last_name}</span>
+                        {lead.phone && <span className="ml-2 text-gray-500">{lead.phone}</span>}
+                        <span className="ml-2 text-xs text-gray-400">#{lead.id}</span>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="px-3 py-2 text-sm text-gray-400">
+                      No matching lead — create the lead first, then book the appointment.
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -497,6 +503,13 @@ export default function AppointmentsPage() {
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
               />
             </div>
+            {(!newLeadId || !newStart || !newEnd) && (
+              <div className="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
+                {!newLeadId
+                  ? "Pick a lead from the dropdown before saving — typing a name alone won't link the appointment."
+                  : "Start and end times are required."}
+              </div>
+            )}
             <div className="flex justify-end gap-2 pt-2">
               <button
                 onClick={() => setCreating(false)}

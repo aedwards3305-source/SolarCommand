@@ -6,7 +6,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from pydantic import BaseModel
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.connectors.md_sdat import normalize_address
@@ -352,6 +352,7 @@ async def list_leads(
     status_filter: LeadStatus | None = None,
     county: str | None = None,
     min_score: int | None = None,
+    q: str | None = Query(None, description="Search by name, phone, or email"),
 ):
     """List leads with optional filters."""
     query = select(Lead).join(Property)
@@ -360,6 +361,16 @@ async def list_leads(
         query = query.where(Lead.status == status_filter)
     if county:
         query = query.where(Property.county == county)
+    if q:
+        pattern = f"%{q.strip()}%"
+        query = query.where(
+            or_(
+                Lead.first_name.ilike(pattern),
+                Lead.last_name.ilike(pattern),
+                Lead.phone.ilike(pattern),
+                Lead.email.ilike(pattern),
+            )
+        )
 
     # Count total
     count_query = select(func.count()).select_from(query.subquery())

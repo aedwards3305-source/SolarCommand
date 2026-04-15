@@ -73,6 +73,8 @@ async def create_appointment(
     lead.status = LeadStatus.appointment_set
     lead.assigned_rep_id = rep.id
 
+    await db.flush()
+
     db.add(
         AuditLog(
             actor="system",
@@ -185,13 +187,18 @@ async def list_appointments(
     rep_id: int | None = None,
     status_filter: AppointmentStatus | None = None,
 ):
-    """List appointments with optional filters."""
+    """List appointments with optional filters.
+
+    Ordering: newest-scheduled first (DESC) so freshly booked future
+    appointments surface at the top instead of getting buried under
+    historical records.
+    """
     query = select(Appointment)
     if rep_id:
         query = query.where(Appointment.rep_id == rep_id)
     if status_filter:
         query = query.where(Appointment.status == status_filter)
-    query = query.order_by(Appointment.scheduled_start.asc())
+    query = query.order_by(Appointment.scheduled_start.desc())
 
     result = await db.execute(query)
     appts = result.scalars().all()
